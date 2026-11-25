@@ -134,6 +134,26 @@
   .toast{position:fixed;bottom:calc(96px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;
     font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
   .toast.show{opacity:1}
+  /* analysis charts: thin bars, 4px rounded data ends, recessive tracks, text in ink colors */
+  .anh{font-size:15px;margin:20px 0 8px;color:var(--muted);font-weight:650}
+  .anrow{margin:0 0 12px}
+  .anlbl{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+  .anlbl b{direction:ltr;unicode-bidi:isolate;white-space:nowrap}
+  .anbar{height:12px;background:var(--bg);border-radius:4px;margin-top:4px;overflow:hidden}
+  .anbar i{display:block;height:100%;background:var(--brand);border-radius:4px}
+  .ansub{font-size:12px;color:var(--muted);margin-top:3px}
+  .stack{display:flex;gap:2px;height:30px;border-radius:4px;overflow:hidden;background:var(--card)}
+  .stack i{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-style:normal;font-weight:650;white-space:nowrap;overflow:hidden;min-width:2px}
+  .stack i.a{background:var(--a)}.stack i.b{background:var(--b)}
+  .legend{display:flex;gap:16px;justify-content:center;font-size:13px;margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .trend{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:18px;border-bottom:1px solid var(--line)}
+  .tcol{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}
+  .tcol i{width:70%;max-width:36px;background:var(--brand);border-radius:4px 4px 0 0;min-height:2px;opacity:.55}
+  .tcol.cur i{opacity:1}
+  .tcol .v{font-size:11px;color:var(--muted);margin-bottom:3px;direction:ltr;white-space:nowrap}
+  .tlabels{display:flex;gap:8px}.tlabels span{flex:1;text-align:center;font-size:11px;color:var(--muted);margin-top:4px}
   .install{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--brand-soft);border:1px solid var(--brand);
     border-radius:12px;padding:8px 12px;margin-bottom:12px;font-weight:600;font-size:14px}
   .steps ol{margin:8px 0 0;padding-inline-start:22px;line-height:1.9}
@@ -168,7 +188,10 @@
     <div class="total"><span>שילמנו ביחד</span><b id="sTotal"></b></div>
     <table id="sTable"></table>
     <div style="height:12px"></div>
-    <button class="btn" id="calcBtn">🧮 חישוב</button>
+    <div class="row">
+      <button class="btn" id="calcBtn">🧮 חישוב</button>
+      <button class="btn ghost" id="anBtn">📊 ניתוח</button>
+    </div>
     <div id="result" class="result hidden"></div>
   </div>
 
@@ -292,7 +315,26 @@
     </div>
     <div style="height:10px"></div>
     <button class="btn ghost" id="installFromSettings">📲 איך מתקינים בטלפון?</button>
-    <div class="muted" style="text-align:center;margin-top:10px">גרסה 10</div>
+    <div class="muted" style="text-align:center;margin-top:10px">גרסה 11</div>
+  </div>
+</div>
+
+<!-- Analysis -->
+<div id="anModal" class="modal hidden">
+  <div class="sheet">
+    <div class="head"><button type="button" class="back" data-close>› חזור</button><h3>📊 ניתוח הוצאות</h3><span class="head-sp"></span></div>
+    <div class="seg" id="anRange"></div>
+    <div class="muted" id="anPeriod" style="text-align:center;margin-top:8px"></div>
+    <div class="total" style="margin-top:6px"><span>סה"כ בתקופה</span><b id="anTotal"></b></div>
+
+    <h4 class="anh">כמה שילמנו על כל קטגוריה</h4>
+    <div id="anCats"></div>
+
+    <h4 class="anh">מי שילם בפועל</h4>
+    <div id="anWho"></div>
+
+    <h4 class="anh">מגמה: 6 חודשים אחרונים</h4>
+    <div id="anTrend"></div>
   </div>
 </div>
 
@@ -544,6 +586,7 @@ function render(){
     <tr><td>שילם/ה בפועל</td><td class="n">${fmt(c.paidA)}</td><td class="n">${fmt(c.paidB)}</td></tr>
     <tr><td>היה צריך לשלם לפי היחס</td><td class="n">${fmt(c.shareA)}</td><td class="n">${fmt(c.shareB)}</td></tr>`;
   if(!$('#result').classList.contains('hidden')) showResult();
+  if(!$('#anModal').classList.contains('hidden')) renderAnalysis();
 }
 function expCard(e){
   const n=N(), c=catOf(e.cat), [,mm,dd]=e.date.split('-'), sB=r2(e.amount-e.shareA);
@@ -883,6 +926,59 @@ $('#expCsv').onclick = () => { const n=N(), q=v=>`"${String(v??'').replace(/"/g,
 /* first run: who am I */
 $$('#meModal [data-me]').forEach(b=>b.onclick = () => { me=b.dataset.me; localStorage.setItem(LS.me,me); closeModal('#meModal'); toast(`שלום ${N()[me]} 👋`); });
 function askMe(){ const n=N(); $('#meModal [data-me="a"]').textContent=n.a; $('#meModal [data-me="b"]').textContent=n.b; openModal('#meModal'); }
+
+/* ================= Analysis ================= */
+let anRange = 'month';
+function anList(){
+  if(anRange==='month') return monthExpenses(month);
+  if(anRange==='6m'){ const ms=new Set([...Array(6)].map((_,i)=>shiftMonth(month,-i))); return data.expenses.filter(e=>ms.has(e.date.slice(0,7))); }
+  if(anRange==='year') return data.expenses.filter(e=>e.date.slice(0,4)===month.slice(0,4));
+  return data.expenses.slice();
+}
+function anPeriodText(){
+  if(anRange==='month') return mLabel(month);
+  if(anRange==='6m') return `${mLabel(shiftMonth(month,-5))} – ${mLabel(month)}`;
+  if(anRange==='year') return 'שנת '+month.slice(0,4);
+  return 'כל ההוצאות';
+}
+function renderAnalysis(){
+  const n=N(), list=anList();
+  seg($('#anRange'), [['month','החודש'],['6m','חצי שנה'],['year','השנה'],['all','הכל']], anRange, v=>{ anRange=v; renderAnalysis(); });
+  $('#anPeriod').textContent = anPeriodText();
+  const total = list.reduce((s,e)=>s+e.amount,0);
+  $('#anTotal').textContent = fmt(total);
+
+  // per category (single series → one hue, values labelled directly)
+  const by = {};
+  for(const e of list){ const k=e.cat||'_none'; const o=by[k]||(by[k]={amt:0,a:0,b:0,n:0}); o.amt+=e.amount; o.a+=e.shareA; o.b+=e.amount-e.shareA; o.n++; }
+  const rows = Object.entries(by).sort((x,y)=>y[1].amt-x[1].amt);
+  const max = Math.max(1, ...rows.map(r=>r[1].amt));
+  $('#anCats').innerHTML = rows.length ? rows.map(([k,o])=>{
+    const c=catOf(k==='_none'?null:k), pct = total? Math.round(o.amt/total*100) : 0, w = Math.max(0, o.amt/max*100);
+    return `<div class="anrow" title="${esc(c.name)}: ${fmt(o.amt)} (${pct}%)">
+      <div class="anlbl"><span>${esc(c.icon)} ${esc(c.name)}</span><b>${fmt(o.amt)} · ${pct}%</b></div>
+      <div class="anbar"><i style="width:${w.toFixed(1)}%"></i></div>
+      <div class="ansub">${o.n} ${o.n===1?'הוצאה':'הוצאות'} · החלק של ${esc(n.a)} ${fmt(o.a)} · החלק של ${esc(n.b)} ${fmt(o.b)}</div>
+    </div>`; }).join('') : '<div class="empty">אין הוצאות בתקופה הזו</div>';
+
+  // who actually paid (two series → legend + names inside the segments, never colour alone)
+  const pa = list.filter(e=>e.payer==='a').reduce((s,e)=>s+e.amount,0), pb = total-pa;
+  const ta = Math.max(0,pa), tb = Math.max(0,pb), tt = ta+tb || 1;
+  $('#anWho').innerHTML = total ? `<div class="stack">
+      ${ta? `<i class="a" style="flex:${ta/tt}" title="${esc(n.a)} ${fmt(pa)}">${esc(n.a)} ${Math.round(ta/tt*100)}%</i>`:''}
+      ${tb? `<i class="b" style="flex:${tb/tt}" title="${esc(n.b)} ${fmt(pb)}">${esc(n.b)} ${Math.round(tb/tt*100)}%</i>`:''}
+    </div>
+    <div class="legend"><span><i style="background:var(--a)"></i>${esc(n.a)} <b class="ltr">${fmt(pa)}</b></span><span><i style="background:var(--b)"></i>${esc(n.b)} <b class="ltr">${fmt(pb)}</b></span></div>`
+    : '<div class="empty">—</div>';
+
+  // 6-month trend (columns, current month emphasised)
+  const ms=[...Array(6)].map((_,i)=>shiftMonth(month,i-5));
+  const vals=ms.map(m=>monthExpenses(m).reduce((s,e)=>s+e.amount,0)), mx=Math.max(1,...vals);
+  $('#anTrend').innerHTML = `<div class="trend">${ms.map((m,i)=>`<div class="tcol ${m===month?'cur':''}" title="${mLabel(m)}: ${fmt(vals[i])}">
+      <span class="v">${vals[i]? fmt(vals[i]) : ''}</span><i style="height:${(Math.max(0,vals[i])/mx*100).toFixed(1)}%"></i></div>`).join('')}</div>
+    <div class="tlabels">${ms.map(m=>`<span>${MONTHS[+m.slice(5)-1].slice(0,3)}'</span>`).join('')}</div>`;
+}
+$('#anBtn').onclick = () => { renderAnalysis(); openModal('#anModal'); };
 
 /* ================= Install (Android: real install prompt; iPhone: Safari → Share → Add to Home Screen) ================= */
 const ua = navigator.userAgent;
