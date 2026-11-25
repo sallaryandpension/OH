@@ -159,7 +159,8 @@
     <div class="head"><h3 id="mTitle">הוצאה חדשה</h3><button class="x" data-close>✕</button></div>
 
     <label>סכום</label>
-    <input id="fAmount" class="amount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="₪ 0">
+    <div class="row" style="align-items:stretch"><button type="button" id="signBtn" class="btn ghost" style="flex:0 0 58px;font-size:24px;padding:0" title="החלפת סימן (סכום שלילי, למשל החזר)">±</button><input id="fAmount" class="amount" type="number" inputmode="decimal" step="0.01" placeholder="₪ 0"></div>
+    <small class="hint" id="negHint" style="display:none">סכום שלילי (למשל החזר או זיכוי): מקטין את סה"כ ואת החלק של כל אחד לפי החלוקה.</small>
 
     <label>סוג</label>
     <div id="catSel" class="catsel"></div>
@@ -174,8 +175,8 @@
     <div class="splitbox hidden" id="splitEditor">
       <div class="seg" id="splitMode"></div>
       <div class="row">
-        <div><label id="lblA"></label><div class="unit"><input id="sA" type="number" inputmode="decimal" step="0.01" min="0"><span class="u"></span></div></div>
-        <div><label id="lblB"></label><div class="unit"><input id="sB" type="number" inputmode="decimal" step="0.01" min="0"><span class="u"></span></div></div>
+        <div><label id="lblA"></label><div class="unit"><input id="sA" type="number" inputmode="decimal" step="0.01"><span class="u"></span></div></div>
+        <div><label id="lblB"></label><div class="unit"><input id="sB" type="number" inputmode="decimal" step="0.01"><span class="u"></span></div></div>
       </div>
       <div class="muted" id="splitInfo" style="margin-top:8px"></div>
       <button type="button" class="linkbtn" id="splitReset"></button>
@@ -407,7 +408,7 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r2 = n => Math.round(n*100)/100;
-const fmt = n => '₪' + r2(n).toLocaleString('he-IL',{maximumFractionDigits:2});
+const fmt = n => (r2(n)<0?'-':'') + '₪' + Math.abs(r2(n)).toLocaleString('he-IL',{maximumFractionDigits:2});
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
 const MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
@@ -462,7 +463,7 @@ function render(){
       return `<div class="exp" data-id="${esc(e.id)}">
         <div class="ic">${esc(c.icon)}</div>
         <div class="mid">
-          <div class="t"><span>${esc(c.name)}${e.receipt?' 🧾':''}</span><span class="amt">${fmt(e.amount)}</span></div>
+          <div class="t"><span>${esc(c.name)}${e.receipt?' 🧾':''}</span><span class="amt"${e.amount<0?' style="color:var(--danger)"':''}>${fmt(e.amount)}</span></div>
           <div class="s">${+dd}.${+mm} · שילם/ה: <span class="who ${e.payer}">${esc(n[e.payer])}</span>${e.note?' · '+esc(e.note):''}</div>
           <div class="split">${esc(n.a)} <b class="ltr">${fmt(e.shareA)}</b> · ${esc(n.b)} <b class="ltr">${fmt(sB)}</b>
             <span class="muted">(${Math.round(e.pctA)}% / ${Math.round(100-e.pctA)}%)</span></div>
@@ -514,7 +515,7 @@ function openExpense(id){
   form = e ? { id:e.id, cat:e.cat, payer:e.payer, pctA:e.pctA, mode:e.splitMode||'pct', receipt:e.receipt||null, newReceipt:null, removeReceipt:false }
            : { id:null, cat:null, payer:me||'a', pctA:data.settings.defaultPctA, mode:'pct', receipt:null, newReceipt:null, removeReceipt:false };
   $('#mTitle').textContent = e? 'עריכת הוצאה' : 'הוצאה חדשה';
-  $('#fAmount').value = e? e.amount : '';
+  $('#fAmount').value = e? e.amount : ''; pendingNeg = false; markNeg();
   $('#fDate').value = e? e.date : defDate;
   $('#fNote').value = e? (e.note||'') : '';
   $('#catSearch').value = '';
@@ -586,7 +587,27 @@ function onSplitInput(who){
 $('#sA').oninput = () => onSplitInput('a');
 $('#sB').oninput = () => onSplitInput('b');
 $('#sA').onblur = $('#sB').onblur = () => fillSplitInputs();
-$('#fAmount').oninput = () => fillSplitInputs();
+/* negative amounts: the ± button flips the sign (phone number keyboards often have no minus key).
+   Pressed before typing → the next number typed becomes negative. */
+let pendingNeg = false;
+$('#fAmount').oninput = () => {
+  const v = amountVal();
+  if(pendingNeg && v>0){ $('#fAmount').value = -v; }
+  if(v) pendingNeg = false;
+  fillSplitInputs(); markNeg();
+};
+function markNeg(){
+  const neg = amountVal()<0 || pendingNeg;
+  $('#fAmount').style.color = neg?'var(--danger)':'';
+  $('#fAmount').placeholder = pendingNeg? '-₪ 0' : '₪ 0';
+  $('#signBtn').textContent = neg? '−' : '±';
+  $('#negHint').style.display = neg?'block':'none';
+}
+$('#signBtn').onclick = () => {
+  const v = amountVal();
+  if(v){ $('#fAmount').value = r2(-v); pendingNeg = false; } else pendingNeg = !pendingNeg;
+  fillSplitInputs(); markNeg(); $('#fAmount').focus();
+};
 $('#splitReset').onclick = () => { form.pctA=data.settings.defaultPctA; renderSplit(); };
 $('#splitOpen').onclick = () => { $('#splitShort').classList.add('hidden'); $('#splitEditor').classList.remove('hidden'); };
 function shortRatio(p){           // 80 → "יחס 1:4" (הדר:אור)
@@ -681,7 +702,7 @@ function dropReceipt(path){
 /* confirm */
 $('#fSave').onclick = async () => {
   const amount = parseFloat($('#fAmount').value);
-  if(!(amount>0)){ toast('נא להזין סכום'); $('#fAmount').focus(); return; }
+  if(!amount || isNaN(amount)){ toast('נא להזין סכום'); $('#fAmount').focus(); return; }
   if(!form.cat){ toast('נא לבחור סוג'); $('#catSearch').focus(); return; }
   await rcPending;
   const id = form.id || uid();
