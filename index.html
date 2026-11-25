@@ -91,6 +91,9 @@
   .sheet .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
   .sheet .head h3{margin:0;font-size:19px}
   .x{background:none;border:0;font-size:22px;color:var(--muted);cursor:pointer}
+  .sheet-actions{position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom));background:var(--card);
+    margin:16px -16px calc(-16px - env(safe-area-inset-bottom));padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+  .sheet-actions .btn.ghost{background:var(--card)}
   .amount{font-size:30px;font-weight:750;text-align:center;direction:ltr}
 
   .catsel{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--brand);background:var(--brand-soft);border-radius:10px;margin-bottom:8px;font-weight:600}
@@ -118,7 +121,7 @@
   .vbody img{max-width:100%;max-height:100%;object-fit:contain}
   .vbody iframe{width:100%;height:100%;border:0;background:#fff}
 
-  .toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;
+  .toast{position:fixed;bottom:calc(96px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;
     font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
   .toast.show{opacity:1}
   small.hint{display:block;color:var(--muted);font-size:12px;margin-top:4px}
@@ -165,9 +168,17 @@
     <small class="hint" id="negHint" style="display:none">סכום שלילי (למשל החזר או זיכוי): מקטין את סה"כ ואת החלק של כל אחד לפי החלוקה.</small>
 
     <label>סוג</label>
-    <div id="catSel" class="catsel"></div>
-    <input id="catSearch" type="search" placeholder="🔍 חיפוש סוג…" autocomplete="off">
-    <div id="catList" class="catlist"></div>
+    <div class="splitbox" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span id="catSel" style="font-weight:650"></span>
+      <span style="display:flex;gap:14px">
+        <button type="button" class="linkbtn" id="catClear">ללא</button>
+        <button type="button" class="linkbtn" id="catOpen">בחירה</button>
+      </span>
+    </div>
+    <div id="catPicker" class="hidden" style="margin-top:8px">
+      <input id="catSearch" type="search" placeholder="🔍 חיפוש סוג…" autocomplete="off" enterkeyhint="done">
+      <div id="catList" class="catlist"></div>
+    </div>
 
     <label>חלוקה</label>
     <div id="splitShort" class="splitbox" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
@@ -204,8 +215,7 @@
         </div></div>
     </div>
 
-    <div style="height:16px"></div>
-    <div class="row">
+    <div class="row sheet-actions">
       <button class="btn ghost" data-close>ביטול</button>
       <button class="btn" id="fSave">אישור</button>
     </div>
@@ -417,7 +427,8 @@ const MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יו
 const mLabel = m => { const [y,mm]=m.split('-'); return MONTHS[+mm-1]+' '+y; };
 const shiftMonth = (m,k) => { let [y,mm]=m.split('-').map(Number); mm+=k; while(mm<1){mm+=12;y--} while(mm>12){mm-=12;y++} return `${y}-${String(mm).padStart(2,'0')}`; };
 const N = () => data.settings.names;
-const catOf = id => data.settings.categories.find(c=>c.id===id) || {id, name:'אחר', icon:'📦'};
+const NO_CAT = {id:null, name:'אין', icon:'💸'};
+const catOf = id => !id ? NO_CAT : (data.settings.categories.find(c=>c.id===id) || {id, name:'אחר', icon:'📦'});
 function ratioText(p){            // 80 → "1:4"
   const a=p, b=100-p; if(!a||!b) return a? `הכל על ${N().a}` : `הכל על ${N().b}`;
   const g=(x,y)=>y?g(y,x%y):x; const k=g(Math.round(a),Math.round(b));
@@ -520,7 +531,7 @@ function openExpense(id){
   $('#fAmount').value = e? e.amount : ''; pendingNeg = false; markNeg();
   $('#fDate').value = e? e.date : defDate;
   $('#fNote').value = e? (e.note||'') : '';
-  $('#catSearch').value = '';
+  $('#catSearch').value = ''; $('#catPicker').classList.add('hidden');
   $('#splitShort').classList.remove('hidden'); $('#splitEditor').classList.add('hidden');
   renderCats(); renderSplit(); renderPayer(); renderReceipt();
   openModal('#expModal');
@@ -531,8 +542,10 @@ function openExpense(id){
 function renderCats(){
   const q = $('#catSearch').value.trim();
   const cats = data.settings.categories;
-  const sel = form.cat && catOf(form.cat);
-  $('#catSel').innerHTML = sel ? `<span style="font-size:22px">${esc(sel.icon)}</span> ${esc(sel.name)}` : '<span class="muted">לא נבחר סוג</span>';
+  const sel = catOf(form.cat);
+  $('#catSel').innerHTML = `<span style="font-size:20px">${esc(sel.icon)}</span> ${esc(sel.name)}`;
+  $('#catOpen').textContent = form.cat? 'שינוי' : 'בחירה';
+  $('#catClear').classList.toggle('hidden', !form.cat);
   const list = q ? cats.filter(c=>c.name.includes(q)) : cats;
   let html = list.map(c=>`<button type="button" class="chip ${c.id===form.cat?'on':''}" data-id="${esc(c.id)}">${esc(c.icon)} ${esc(c.name)}</button>`).join('');
   if(q && !cats.some(c=>c.name===q)) html += `<button type="button" class="chip add" data-new="1">➕ הוספת סוג "${esc(q)}"</button>`;
@@ -543,12 +556,17 @@ $('#catList').onclick = e => {
   const b=e.target.closest('.chip'); if(!b) return;
   if(b.dataset.new){
     const name=$('#catSearch').value.trim(), id='c'+uid();
-    const icon = prompt(`אימוג'י לסוג "${name}" (לא חובה):`, '🏷️') || '🏷️';
-    change(d=>{ d.settings.categories.push({id,name,icon:icon.trim().slice(0,4)}); }, 'סוג חדש: '+name);
+    change(d=>{ d.settings.categories.push({id,name,icon:'🏷️'}); }, 'סוג חדש: '+name);
     form.cat=id;
   } else form.cat=b.dataset.id;
-  $('#catSearch').value=''; renderCats();
+  $('#catSearch').value=''; $('#catPicker').classList.add('hidden'); renderCats();
 };
+$('#catOpen').onclick = () => {
+  const p=$('#catPicker'), open=p.classList.contains('hidden');
+  p.classList.toggle('hidden', !open);
+  if(open){ $('#catSearch').value=''; renderCats(); $('#catSearch').focus(); }
+};
+$('#catClear').onclick = () => { form.cat=null; $('#catPicker').classList.add('hidden'); renderCats(); };
 
 /* split: percent or amount */
 const amountVal = () => parseFloat($('#fAmount').value)||0;
@@ -705,7 +723,6 @@ function dropReceipt(path){
 $('#fSave').onclick = async () => {
   const amount = parseFloat($('#fAmount').value);
   if(!amount || isNaN(amount)){ toast('נא להזין סכום'); $('#fAmount').focus(); return; }
-  if(!form.cat){ toast('נא לבחור סוג'); $('#catSearch').focus(); return; }
   await rcPending;
   const id = form.id || uid();
   const old = form.id && data.expenses.find(x=>x.id===form.id);
