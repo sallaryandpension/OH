@@ -131,6 +131,12 @@
   .toast{position:fixed;bottom:calc(96px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;
     font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
   .toast.show{opacity:1}
+  .install{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--brand-soft);border:1px solid var(--brand);
+    border-radius:12px;padding:8px 12px;margin-bottom:12px;font-weight:600;font-size:14px}
+  .steps ol{margin:8px 0 0;padding-inline-start:22px;line-height:1.9}
+  .steps .sh{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;background:#0a84ff;color:#fff;vertical-align:middle}
+  .steps .warn{background:#fff4e5;color:#7a4b00;border-radius:10px;padding:10px;font-size:14px;margin-top:10px}
+  @media (prefers-color-scheme: dark){ .steps .warn{background:#3a2c14;color:#f3d29a} }
   small.hint{display:block;color:var(--muted);font-size:12px;margin-top:4px}
 </style>
 </head>
@@ -142,6 +148,13 @@
 </header>
 
 <main>
+  <div id="installBar" class="install hidden">
+    <span>📲 להתקנה כאפליקציה בטלפון</span>
+    <span style="display:flex;gap:8px;align-items:center">
+      <button class="btn small" id="installBtn">התקנה</button>
+      <button class="x" id="installX" title="הסתרה" style="font-size:18px">✕</button>
+    </span>
+  </div>
   <div class="monthbar">
     <button id="mPrev" title="חודש קודם">›</button>
     <h2 id="monthTitle"></h2>
@@ -274,6 +287,16 @@
       <button class="btn ghost" id="expCsv">ייצוא CSV</button>
       <button class="btn ghost" id="expJson">ייצוא JSON</button>
     </div>
+  </div>
+</div>
+
+<!-- Install instructions -->
+<div id="installModal" class="modal hidden">
+  <div class="sheet">
+    <div class="head"><h3>📲 התקנת האפליקציה</h3><button class="x" data-close>✕</button></div>
+    <div id="installSteps" class="steps"></div>
+    <div style="height:12px"></div>
+    <button class="btn" data-close>הבנתי</button>
   </div>
 </div>
 
@@ -832,10 +855,48 @@ $('#expCsv').onclick = () => { const n=N(), q=v=>`"${String(v??'').replace(/"/g,
 $$('#meModal [data-me]').forEach(b=>b.onclick = () => { me=b.dataset.me; localStorage.setItem(LS.me,me); closeModal('#meModal'); toast(`שלום ${N()[me]} 👋`); });
 function askMe(){ const n=N(); $('#meModal [data-me="a"]').textContent=n.a; $('#meModal [data-me="b"]').textContent=n.b; openModal('#meModal'); }
 
+/* ================= Install (Android: real install prompt; iPhone: Safari → Share → Add to Home Screen) ================= */
+const ua = navigator.userAgent;
+const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOSSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA|Instagram|FBAN|FBAV|Line\//.test(ua);
+const isMobile = isIOS || /Android/.test(ua);
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; showInstallBar(); });
+window.addEventListener('appinstalled', () => { $('#installBar').classList.add('hidden'); toast('✓ האפליקציה הותקנה'); });
+function showInstallBar(){
+  if(isStandalone || localStorage.getItem('oh_install_hidden')) return;
+  if(isMobile || deferredPrompt) $('#installBar').classList.remove('hidden');
+}
+$('#installX').onclick = () => { localStorage.setItem('oh_install_hidden','1'); $('#installBar').classList.add('hidden'); };
+$('#installBtn').onclick = async () => {
+  if(deferredPrompt){ deferredPrompt.prompt(); const r = await deferredPrompt.userChoice; deferredPrompt = null; if(r.outcome==='accepted') $('#installBar').classList.add('hidden'); return; }
+  const share = '<span class="sh">⬆︎</span>';
+  let html;
+  if(isIOS){
+    html = `<ol>
+      <li>לוחצים על כפתור השיתוף ${share} (בתחתית המסך בספארי, או למעלה באייפד)</li>
+      <li>גוללים למטה ובוחרים <b>"הוספה למסך הבית"</b> ➕</li>
+      <li>לוחצים <b>"הוסף"</b> בפינה העליונה</li>
+      <li>פותחים את האפליקציה <b>מהאייקון החדש</b> במסך הבית</li></ol>`;
+    if(!isIOSSafari) html += `<div class="warn">⚠️ נראה שהקישור נפתח בתוך אפליקציה אחרת (וואטסאפ, אינסטגרם או כרום).
+      אם אין "הוספה למסך הבית", צריך לפתוח את הקישור ב<b>ספארי</b>: לוחצים על ⋯ או על סמל המצפן ובוחרים "פתיחה בספארי".
+      אפשר גם להעתיק את הכתובת ולהדביק בספארי:<br><b dir="ltr">${esc(location.href.split('?')[0])}</b></div>`;
+  } else {
+    html = `<ol>
+      <li>פותחים את הקישור ב<b>כרום</b></li>
+      <li>לוחצים על תפריט ⋮ למעלה</li>
+      <li>בוחרים <b>"התקנת אפליקציה"</b> או <b>"הוספה למסך הבית"</b></li></ol>`;
+  }
+  $('#installSteps').innerHTML = html;
+  openModal('#installModal');
+};
+
 /* ================= Start ================= */
 render();
 if(cfg) refresh().then(uploadLocal); else setSync('local');
 if(!me) askMe();
+showInstallBar();
 $('#sync').onclick = () => { if(cfg) refresh(); else $('#gear').click(); };
 setInterval(()=>{ if(cfg && document.visibilityState==='visible') refresh(true); }, 5000);
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') refresh(true); });
