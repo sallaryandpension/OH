@@ -167,7 +167,11 @@
     <div id="catList" class="catlist"></div>
 
     <label>חלוקה</label>
-    <div class="splitbox">
+    <div id="splitShort" class="splitbox" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span id="splitShortTxt" style="font-weight:650"></span>
+      <button type="button" class="linkbtn" id="splitOpen">לשינוי</button>
+    </div>
+    <div class="splitbox hidden" id="splitEditor">
       <div class="seg" id="splitMode"></div>
       <div class="row">
         <div><label id="lblA"></label><div class="unit"><input id="sA" type="number" inputmode="decimal" step="0.01" min="0"><span class="u"></span></div></div>
@@ -514,6 +518,7 @@ function openExpense(id){
   $('#fDate').value = e? e.date : defDate;
   $('#fNote').value = e? (e.note||'') : '';
   $('#catSearch').value = '';
+  $('#splitShort').classList.remove('hidden'); $('#splitEditor').classList.add('hidden');
   renderCats(); renderSplit(); renderPayer(); renderReceipt();
   openModal('#expModal');
   if(!e) setTimeout(()=>$('#fAmount').focus(), 50);
@@ -563,6 +568,7 @@ function fillSplitInputs(skip){
     if(skip!=='a') a.value = amt? sa : ''; if(skip!=='b') b.value = amt? r2(amt-sa) : '';
   }
   const sa=r2(amt*form.pctA/100);
+  $('#splitShortTxt').innerHTML = shortRatio(form.pctA) + (amt? ` <span class="muted">(${esc(N().a)} <span class="ltr">${fmt(sa)}</span> · ${esc(N().b)} <span class="ltr">${fmt(amt-sa)}</span>)</span>` : '');
   $('#splitInfo').innerHTML = amt
     ? `${esc(N().a)} <b class="ltr">${fmt(sa)}</b> · ${esc(N().b)} <b class="ltr">${fmt(amt-sa)}</b> · ${esc(ratioText(form.pctA))}`
     : esc(ratioText(form.pctA));
@@ -582,6 +588,12 @@ $('#sB').oninput = () => onSplitInput('b');
 $('#sA').onblur = $('#sB').onblur = () => fillSplitInputs();
 $('#fAmount').oninput = () => fillSplitInputs();
 $('#splitReset').onclick = () => { form.pctA=data.settings.defaultPctA; renderSplit(); };
+$('#splitOpen').onclick = () => { $('#splitShort').classList.add('hidden'); $('#splitEditor').classList.remove('hidden'); };
+function shortRatio(p){           // 80 → "יחס 1:4" (הדר:אור)
+  const a=Math.round(p), b=100-a; if(!a) return `הכל על ${esc(N().b)}`; if(!b) return `הכל על ${esc(N().a)}`;
+  const g=(x,y)=>y?g(y,x%y):x, k=g(a,b);
+  return `יחס <span class="ltr">${b/k}:${a/k}</span>`;
+}
 
 function renderPayer(){ const n=N(); seg($('#fPayer'), [['a',n.a],['b',n.b]], form.payer, v=>{ form.payer=v; renderPayer(); }); }
 
