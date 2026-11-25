@@ -135,6 +135,13 @@
     font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
   .toast.show{opacity:1}
   /* analysis charts: thin bars, 4px rounded data ends, recessive tracks, text in ink colors */
+  .goal{margin:4px 0 8px}
+  .goal .gtop{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}
+  .goal .gbar{height:10px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:5px}
+  .goal .gbar i{display:block;height:100%;background:var(--brand);border-radius:4px}
+  .goal.over .gbar i{background:var(--danger)}
+  .goal .gsub{font-size:13px;margin-top:4px;color:var(--muted)}
+  .goal.over .gsub{color:var(--danger);font-weight:650}
   .anh{font-size:15px;margin:20px 0 8px;color:var(--muted);font-weight:650}
   .anrow{margin:0 0 12px}
   .anlbl{display:flex;justify-content:space-between;gap:8px;font-size:14px}
@@ -186,6 +193,7 @@
 
   <div class="card" id="sumCard">
     <div class="total"><span>שילמנו ביחד</span><b id="sTotal"></b></div>
+    <div id="goalBox" class="goal"></div>
     <table id="sTable"></table>
     <div style="height:12px"></div>
     <div class="row">
@@ -315,7 +323,21 @@
     </div>
     <div style="height:10px"></div>
     <button class="btn ghost" id="installFromSettings">📲 איך מתקינים בטלפון?</button>
-    <div class="muted" style="text-align:center;margin-top:10px">גרסה 11</div>
+    <div class="muted" style="text-align:center;margin-top:10px">גרסה 12</div>
+  </div>
+</div>
+
+<!-- Monthly goal -->
+<div id="goalModal" class="modal hidden">
+  <div class="sheet">
+    <div class="head"><button type="button" class="back" data-close>› חזור</button><h3>🎯 יעד חודשי</h3><span class="head-sp"></span></div>
+    <label id="goalLbl"></label>
+    <input id="goalInput" class="amount" type="number" inputmode="decimal" step="1" min="0" placeholder="₪ 0">
+    <small class="hint" id="goalHint"></small>
+    <div class="row sheet-actions">
+      <button class="btn danger" id="goalRemove">הסרת היעד</button>
+      <button class="btn" id="goalSave">שמירה</button>
+    </div>
   </div>
 </div>
 
@@ -387,6 +409,7 @@ function normalize(d){
   s.names = Object.assign({a:'אור',b:'הדר'}, s.names||{});
   if(!Array.isArray(s.categories) || !s.categories.length) s.categories = f.settings.categories;
   if(typeof s.defaultPctA!=='number') s.defaultPctA = DEFAULT_PCT_A;
+  if(!s.goals || typeof s.goals!=='object') s.goals = {};
   d.expenses = Array.isArray(d.expenses)? d.expenses : [];
   for(const e of d.expenses){          // older rows (v1) → per-row split
     if(typeof e.shareA!=='number'){
@@ -587,6 +610,7 @@ function render(){
     <tr><td>היה צריך לשלם לפי היחס</td><td class="n">${fmt(c.shareA)}</td><td class="n">${fmt(c.shareB)}</td></tr>`;
   if(!$('#result').classList.contains('hidden')) showResult();
   if(!$('#anModal').classList.contains('hidden')) renderAnalysis();
+  renderGoal(c.total);
 }
 function expCard(e){
   const n=N(), c=catOf(e.cat), [,mm,dd]=e.date.split('-'), sB=r2(e.amount-e.shareA);
@@ -926,6 +950,37 @@ $('#expCsv').onclick = () => { const n=N(), q=v=>`"${String(v??'').replace(/"/g,
 /* first run: who am I */
 $$('#meModal [data-me]').forEach(b=>b.onclick = () => { me=b.dataset.me; localStorage.setItem(LS.me,me); closeModal('#meModal'); toast(`שלום ${N()[me]} 👋`); });
 function askMe(){ const n=N(); $('#meModal [data-me="a"]').textContent=n.a; $('#meModal [data-me="b"]').textContent=n.b; openModal('#meModal'); }
+
+/* ================= Monthly goal ================= */
+function renderGoal(spent){
+  const g = data.settings.goals[month], box = $('#goalBox');
+  if(!g){ box.className='goal'; box.innerHTML = `<button type="button" class="linkbtn" id="goalAdd">🎯 הוספת יעד לחודש</button>`; $('#goalAdd').onclick=openGoal; return; }
+  const pct = spent/g*100, over = spent>g;
+  box.className = 'goal' + (over?' over':'');
+  box.innerHTML = `<div class="gtop"><span>🎯 יעד: <b class="ltr">${fmt(g)}</b> · נוצל ${Math.round(pct)}%</span>
+      <button type="button" class="linkbtn" id="goalEdit">עריכה</button></div>
+    <div class="gbar"><i style="width:${Math.min(100,Math.max(0,pct)).toFixed(1)}%"></i></div>
+    <div class="gsub">${over ? `⚠️ חרגתם מהיעד ב-<span class="ltr">${fmt(spent-g)}</span>` : `נשארו <span class="ltr">${fmt(g-spent)}</span> עד היעד`}</div>`;
+  $('#goalEdit').onclick = openGoal;
+}
+function openGoal(){
+  const g = data.settings.goals[month];
+  $('#goalLbl').textContent = 'יעד הוצאות ל' + mLabel(month);
+  $('#goalInput').value = g || '';
+  const prev = data.settings.goals[shiftMonth(month,-1)];
+  $('#goalHint').textContent = !g && prev ? `בחודש הקודם היעד היה ${fmt(prev)}` : 'כמה אתם רוצים להוציא ביחד בחודש הזה';
+  $('#goalRemove').classList.toggle('hidden', !g);
+  openModal('#goalModal');
+  setTimeout(()=>$('#goalInput').focus(), 50);
+}
+$('#goalSave').onclick = () => {
+  const v = Math.round(parseFloat($('#goalInput').value)||0), m = month;
+  if(!(v>0)){ toast('נא להזין סכום יעד'); return; }
+  closeModal('#goalModal'); toast(`🎯 יעד ל${mLabel(m)}: ${fmt(v)}`);
+  change(d=>{ d.settings.goals = d.settings.goals||{}; d.settings.goals[m]=v; }, `יעד ${m}: ${v}`);
+};
+$('#goalRemove').onclick = () => { const m=month; closeModal('#goalModal');
+  change(d=>{ if(d.settings.goals) delete d.settings.goals[m]; }, `הסרת יעד ${m}`); };
 
 /* ================= Analysis ================= */
 let anRange = 'month';
