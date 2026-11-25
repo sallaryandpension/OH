@@ -71,6 +71,11 @@
   .exp .acts button{background:var(--bg);border:1px solid var(--line);border-radius:8px;width:34px;height:32px;cursor:pointer;font-size:15px}
   .who{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;color:#fff}
   .who.a{background:var(--a)}.who.b{background:var(--b)}
+  .rows-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;color:var(--ink);
+    font:inherit;font-weight:650;font-size:16px;padding:2px 0;cursor:pointer}
+  .rows-toggle .arrow{font-size:18px;color:var(--brand);transition:transform .2s}
+  .rows-toggle[aria-expanded="true"] .arrow{transform:rotate(180deg)}
+  .rows-toggle[aria-expanded="true"]{margin-bottom:4px;padding-bottom:10px;border-bottom:1px solid var(--line)}
   .empty{text-align:center;color:var(--muted);padding:26px 10px}
 
   /* summary */
@@ -141,20 +146,21 @@
     <button id="mNext" title="חודש הבא">‹</button>
   </div>
 
-  <div class="card total" style="align-items:center;padding:12px 16px"><span>שילמנו ביחד</span><b id="sTotal"></b></div>
-
-  <button class="btn big" id="addBtn">➕ הוסף הוצאה</button>
-
-  <div class="card">
-    <div id="rows"></div>
-  </div>
-
   <div class="card" id="sumCard">
-    <h3>סיכום החודש</h3>
+    <div class="total"><span>שילמנו ביחד</span><b id="sTotal"></b></div>
     <table id="sTable"></table>
     <div style="height:12px"></div>
     <button class="btn" id="calcBtn">🧮 חישוב</button>
     <div id="result" class="result hidden"></div>
+  </div>
+
+  <button class="btn big" id="addBtn">➕ הוסף הוצאה</button>
+
+  <div class="card">
+    <button type="button" id="rowsToggle" class="rows-toggle" aria-expanded="false">
+      <span id="rowsCount">הוצאות</span><span class="arrow">▾</span>
+    </button>
+    <div id="rows" class="hidden"></div>
   </div>
 </main>
 
@@ -469,6 +475,7 @@ function render(){
   $('#monthTitle').textContent = 'הוצאות החודש ' + mLabel(month);
 
   const items = monthExpenses(month).sort((x,y)=> y.date.localeCompare(x.date) || y.ts-x.ts);
+  $('#rowsCount').textContent = items.length ? `הוצאות החודש (${items.length})` : 'אין עדיין הוצאות בחודש הזה';
   $('#rows').innerHTML = !items.length ? `<div class="empty">עוד אין הוצאות בחודש הזה.<br>לחצו על "הוסף הוצאה" כדי להתחיל.</div>`
     : items.map(e=>{
       const c=catOf(e.cat), [,mm,dd]=e.date.split('-');
@@ -506,6 +513,10 @@ function showResult(){
 $('#calcBtn').onclick = () => { showResult(); $('#result').scrollIntoView({behavior:'smooth', block:'nearest'}); };
 $('#mPrev').onclick = () => { month=shiftMonth(month,-1); $('#result').classList.add('hidden'); render(); };
 $('#mNext').onclick = () => { month=shiftMonth(month,1); $('#result').classList.add('hidden'); render(); };
+$('#rowsToggle').onclick = () => {
+  const t=$('#rowsToggle'), open=t.getAttribute('aria-expanded')!=='true';
+  t.setAttribute('aria-expanded', open); $('#rows').classList.toggle('hidden', !open);
+};
 $('#rows').addEventListener('click', e=>{
   const b=e.target.closest('button[data-act]'); if(!b) return;
   const id=b.closest('.exp').dataset.id;
@@ -782,8 +793,21 @@ $('#ghConnect').onclick = async () => {
       data=init; localStorage.removeItem(LS.local);
     } else data=d;
     localStorage.setItem(LS.cfg, JSON.stringify(cfg)); persistLocal(); setSync('ok'); toast('מחובר ✓'); render(); renderSettings();
+    await uploadLocal();
   }catch(e){ cfg=prev; setSync(cfg?'error':'local', e.message); toast('⚠️ '+e.message); }
 };
+/* Expenses saved on this device before it was connected are merged into GitHub automatically (no duplicates). */
+async function uploadLocal(){
+  if(!cfg) return;
+  const local = normalize(JSON.parse(localStorage.getItem(LS.local)||'null'));
+  if(!local.expenses.length){ localStorage.removeItem(LS.local); return; }
+  const n = local.expenses.length;
+  await change(d=>{ const ids=new Set(d.expenses.map(e=>e.id)); for(const e of local.expenses) if(!ids.has(e.id)) d.expenses.push(e);
+    const cids=new Set(d.settings.categories.map(c=>c.id)); for(const c of local.settings.categories) if(!cids.has(c.id)) d.settings.categories.push(c); },
+    `העלאת ${n} הוצאות שנשמרו במכשיר`);
+  localStorage.removeItem(LS.local);
+  toast(`☁️ ${n} הוצאות מהמכשיר הועלו לסנכרון`);
+}
 $('#ghDisconnect').onclick = () => { if(!cfg || !confirm('לנתק את הסנכרון בטלפון הזה? (הנתונים ב-GitHub נשארים)')) return;
   localStorage.setItem(LS.local, JSON.stringify(data)); localStorage.removeItem(LS.cfg); localStorage.removeItem(LS.cache);
   cfg=null; setSync('local'); render(); renderSettings(); };
@@ -805,7 +829,7 @@ function askMe(){ const n=N(); $('#meModal [data-me="a"]').textContent=n.a; $('#
 
 /* ================= Start ================= */
 render();
-if(cfg) refresh(); else setSync('local');
+if(cfg) refresh().then(uploadLocal); else setSync('local');
 if(!me) askMe();
 $('#sync').onclick = () => { if(cfg) refresh(); else $('#gear').click(); };
 setInterval(()=>{ if(cfg && document.visibilityState==='visible') refresh(true); }, 5000);
