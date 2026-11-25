@@ -95,7 +95,10 @@
   .sheet{background:var(--card);width:100%;max-width:560px;max-height:94vh;overflow:auto;border-radius:18px 18px 0 0;
     padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
   @media (min-width:600px){ .modal{align-items:center} .sheet{border-radius:18px} }
-  .sheet .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .sheet .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:-4px 0 6px}
+  .sheet .head h3{flex:1;text-align:center}
+  .back{background:var(--brand-soft);color:var(--brand);border:0;border-radius:10px;padding:8px 12px;font:inherit;font-weight:650;font-size:15px;cursor:pointer;white-space:nowrap}
+  .head-sp{width:80px}
   .sheet .head h3{margin:0;font-size:19px}
   .x{background:none;border:0;font-size:22px;color:var(--muted);cursor:pointer}
   .sheet-actions{position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom));background:var(--card);
@@ -182,7 +185,7 @@
 <!-- Add / edit expense -->
 <div id="expModal" class="modal hidden">
   <div class="sheet">
-    <div class="head"><h3 id="mTitle">הוצאה חדשה</h3><button class="x" data-close>✕</button></div>
+    <div class="head"><button type="button" class="back" data-close>› חזור</button><h3 id="mTitle">הוצאה חדשה</h3><span class="head-sp"></span></div>
 
     <label>סכום</label>
     <div class="row" style="align-items:stretch"><button type="button" id="signBtn" class="btn ghost" style="flex:0 0 58px;font-size:24px;padding:0" title="החלפת סימן (סכום שלילי, למשל החזר)">±</button><input id="fAmount" class="amount" type="number" inputmode="decimal" step="0.01" placeholder="₪ 0"></div>
@@ -246,7 +249,7 @@
 <!-- Settings -->
 <div id="setModal" class="modal hidden">
   <div class="sheet">
-    <div class="head"><h3>הגדרות</h3><button class="x" data-close>✕</button></div>
+    <div class="head"><button type="button" class="back" data-close>› חזור</button><h3>הגדרות</h3><span class="head-sp"></span></div>
 
     <label>מי משתמש בטלפון הזה?</label>
     <div id="setMe" class="seg"></div>
@@ -289,14 +292,14 @@
     </div>
     <div style="height:10px"></div>
     <button class="btn ghost" id="installFromSettings">📲 איך מתקינים בטלפון?</button>
-    <div class="muted" style="text-align:center;margin-top:10px">גרסה 9</div>
+    <div class="muted" style="text-align:center;margin-top:10px">גרסה 10</div>
   </div>
 </div>
 
 <!-- Install instructions -->
 <div id="installModal" class="modal hidden">
   <div class="sheet">
-    <div class="head"><h3>📲 התקנת האפליקציה</h3><button class="x" data-close>✕</button></div>
+    <div class="head"><button type="button" class="back" data-close>› חזור</button><h3>📲 התקנת האפליקציה</h3><span class="head-sp"></span></div>
     <div id="installSteps" class="steps"></div>
     <div style="height:12px"></div>
     <button class="btn" data-close>הבנתי</button>
@@ -314,7 +317,7 @@
 
 <div class="toast" id="toast"></div>
 <div id="viewer" class="viewer hidden">
-  <div class="vbar"><a id="viewerOpen" target="_blank" rel="noopener">פתיחה / שמירה</a><button id="viewerClose">✕ סגירה</button></div>
+  <div class="vbar"><a id="viewerOpen" target="_blank" rel="noopener">פתיחה / שמירה</a><button id="viewerClose">› חזור</button></div>
   <div class="vbody" id="viewerBody"></div>
 </div>
 
@@ -477,8 +480,31 @@ function seg(el, opts, val, onPick){
   el.innerHTML = opts.map(([v,t])=>`<button type="button" data-v="${v}" class="${v===val?'on':''}">${esc(t)}</button>`).join('');
   el.onclick = e => { const b=e.target.closest('button'); if(b) onPick(b.dataset.v); };
 }
-function openModal(id){ $(id).classList.remove('hidden'); document.body.classList.add('lock'); }
-function closeModal(id){ $(id).classList.add('hidden'); if(!$$('.modal:not(.hidden)').length) document.body.classList.remove('lock'); }
+/* Windows are tied to browser history, so the iPhone swipe-back gesture and the Android back button
+   close the open window instead of leaving the app. */
+const modalStack = [];
+function hideModal(id){
+  $(id).classList.add('hidden');
+  if(id==='#viewer') $('#viewerBody').innerHTML='';
+  const i = modalStack.lastIndexOf(id); if(i>=0) modalStack.splice(i,1);
+  if(!modalStack.length) document.body.classList.remove('lock');
+}
+function openModal(id, replacing){
+  if(modalStack.includes(id)) return;
+  if(replacing && modalStack.includes(replacing)){ hideModal(replacing); history.replaceState({modal:id}, ''); }
+  else if(id!=='#meModal') history.pushState({modal:id}, '');
+  $(id).classList.remove('hidden'); document.body.classList.add('lock');
+  modalStack.push(id);
+}
+function closeModal(id){
+  if(!modalStack.includes(id)) return;
+  if(history.state && history.state.modal===id) history.back();   // popstate will hide it
+  else hideModal(id);
+}
+window.addEventListener('popstate', () => {
+  const top = modalStack[modalStack.length-1];
+  if(top && top!=='#meModal') hideModal(top);
+});
 $$('[data-close]').forEach(b=>b.onclick = () => closeModal('#'+b.closest('.modal').id));
 $$('.modal').forEach(m=>m.addEventListener('click', e=>{ if(e.target===m && m.id!=='meModal') closeModal('#'+m.id); }));
 
@@ -739,10 +765,10 @@ async function openViewer(){
   }catch(e){ toast('⚠️ '+e.message); return; }
   $('#viewerBody').innerHTML = pdf? `<iframe src="${url}"></iframe>` : `<img src="${url}" alt="קבלה">`;
   $('#viewerOpen').href=url; $('#viewerOpen').download = pdf?'receipt.pdf':'receipt.jpg';
-  $('#viewer').classList.remove('hidden');
+  openModal('#viewer');
 }
 $('#rcView').onclick = openViewer; $('#rcThumb').onclick = openViewer;
-$('#viewerClose').onclick = () => { $('#viewer').classList.add('hidden'); $('#viewerBody').innerHTML=''; };
+$('#viewerClose').onclick = () => closeModal('#viewer');
 async function storeReceipt(expId, nr){
   if(cfg){
     const dir = cfg.path.includes('/')? cfg.path.slice(0,cfg.path.lastIndexOf('/')+1) : '';
@@ -864,7 +890,7 @@ const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.
 const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const isIOSSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA|Instagram|FBAN|FBAV|Line\//.test(ua);
 const isMobile = isIOS || /Android/.test(ua);
-let deferredPrompt = null;
+let deferredPrompt = null, installFrom = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; showInstallBar(); });
 window.addEventListener('appinstalled', () => { $('#installBar').classList.add('hidden'); toast('✓ האפליקציה הותקנה'); });
 function showInstallBar(){
@@ -895,10 +921,10 @@ $('#installBtn').onclick = async () => {
       <li>בוחרים <b>"התקנת אפליקציה"</b> או <b>"הוספה למסך הבית"</b></li></ol>`;
   }
   $('#installSteps').innerHTML = html;
-  openModal('#installModal');
+  openModal('#installModal', installFrom); installFrom = null;
 };
 
-$('#installFromSettings').onclick = () => { closeModal('#setModal'); $('#installBtn').click(); };
+$('#installFromSettings').onclick = () => { installFrom = '#setModal'; $('#installBtn').click(); };
 
 /* ================= Start ================= */
 render();
