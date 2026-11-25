@@ -16,7 +16,6 @@
   :root{
     --bg:#f5f3ee; --card:#fff; --ink:#1f2622; --muted:#6b736e; --line:#e4e1d9;
     --brand:#2f6f5e; --brand-soft:#e3efe9; --a:#2f6f5e; --b:#c0623b; --danger:#b3261e;
-    --radius:14px;
   }
   @media (prefers-color-scheme: dark){
     :root{ --bg:#141816; --card:#1d2320; --ink:#e9ece9; --muted:#9aa39e; --line:#2c3430;
@@ -25,240 +24,243 @@
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;font-size:16px}
-  header{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 10px;
-    display:flex;align-items:center;justify-content:space-between;gap:8px}
+  body.lock{overflow:hidden}
+  header{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;
+    padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:8px}
   @media (prefers-color-scheme: dark){ header{background:#1f3a31} }
-  header h1{font-size:18px;margin:0;font-weight:650}
-  #sync{font-size:12px;opacity:.9;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:99px;cursor:pointer;white-space:nowrap}
-  main{max-width:640px;margin:0 auto;padding:14px 14px 96px}
-  nav{position:fixed;bottom:0;inset-inline:0;z-index:5;background:var(--card);border-top:1px solid var(--line);
-    display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
-  nav button{flex:1;background:none;border:0;color:var(--muted);font:inherit;font-size:12px;padding:6px 2px;
-    display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border-radius:10px}
-  nav button span{font-size:20px}
-  nav button.on{color:var(--brand);background:var(--brand-soft);font-weight:600}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
-  .card h2{font-size:15px;margin:0 0 10px;color:var(--muted);font-weight:600}
-  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
-  input,select,textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
-    background:var(--bg);color:var(--ink)}
-  input:focus,select:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:-1px}
-  .amount{font-size:28px;font-weight:700;text-align:center;direction:ltr}
-  .row{display:flex;gap:10px}.row>*{flex:1}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:600;border:0;border-radius:10px;
-    padding:12px 16px;background:var(--brand);color:#fff;cursor:pointer;width:100%}
+  header h1{font-size:17px;margin:0;font-weight:650;flex:1}
+  #sync{font-size:12px;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:99px;cursor:pointer;white-space:nowrap}
+  #gear{background:none;border:0;color:#fff;font-size:22px;cursor:pointer;padding:0 4px}
+  main{max-width:640px;margin:0 auto;padding:14px 14px calc(30px + env(safe-area-inset-bottom))}
+
+  .monthbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 14px}
+  .monthbar h2{margin:0;font-size:21px;text-align:center;flex:1}
+  .monthbar button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:40px;height:40px;font-size:20px;cursor:pointer}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .card h3{font-size:15px;margin:0 0 10px;color:var(--muted);font-weight:600}
+  label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+  input,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+  input:focus{outline:2px solid var(--brand);outline-offset:-1px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:650;border:0;border-radius:12px;
+    padding:13px 16px;background:var(--brand);color:#fff;cursor:pointer;width:100%}
   .btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--line)}
   .btn.danger{background:transparent;color:var(--danger);border:1px solid var(--line)}
-  .btn.small{width:auto;padding:6px 12px;font-size:14px}
+  .btn.small{width:auto;padding:7px 12px;font-size:14px}
+  .btn.big{font-size:18px;padding:15px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
   .btn:disabled{opacity:.5}
+  .row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
   .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
   .seg button{flex:1;border:0;background:var(--bg);color:var(--ink);font:inherit;padding:9px 4px;cursor:pointer}
   .seg button.on{background:var(--brand);color:#fff;font-weight:600}
-  .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
-  .cat{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 4px;text-align:center;cursor:pointer;font-size:13px;color:var(--ink)}
-  .cat .ic{font-size:24px;display:block}
-  .cat.on{border-color:var(--brand);background:var(--brand-soft);font-weight:600;outline:1px solid var(--brand)}
-  .monthbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .monthbar b{font-size:18px}
-  .monthbar button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:42px;height:38px;font-size:18px;cursor:pointer}
-  .item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
-  .item:last-child{border-bottom:0}
-  .item .ic{font-size:24px;width:36px;text-align:center}
-  .item .mid{flex:1;min-width:0}
-  .item .t{font-weight:600}
-  .item .s{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .item .amt{font-weight:700;direction:ltr;white-space:nowrap}
-  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;color:#fff;margin-inline-start:4px;vertical-align:1px}
-  .tag.a{background:var(--a)}.tag.b{background:var(--b)}
-  .day{font-size:12px;color:var(--muted);margin:12px 0 0;font-weight:600}
-  .big{font-size:30px;font-weight:750;direction:ltr;text-align:center}
   .muted{color:var(--muted);font-size:13px}
-  .bar{height:10px;background:var(--bg);border-radius:99px;overflow:hidden;margin-top:4px}
-  .bar i{display:block;height:100%;background:var(--brand);border-radius:99px}
-  .crow{margin:10px 0}
-  .crow .top{display:flex;justify-content:space-between;font-size:14px}
-  .settle{text-align:center;padding:14px;border-radius:12px;background:var(--brand-soft);font-size:17px;font-weight:650}
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:start}
-  td.n,th.n{text-align:end;direction:ltr}
-  .ratio{display:flex;align-items:center;gap:10px}
-  .ratio input[type=range]{flex:1;padding:0;accent-color:var(--brand)}
-  .ratio .lbl{min-width:70px;text-align:center;font-size:14px;font-weight:600}
-  .empty{text-align:center;color:var(--muted);padding:30px 10px}
-  .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;
-    font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
-  .toast.show{opacity:1}
-  .chips{display:flex;flex-wrap:wrap;gap:6px}
-  .chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:14px}
-  .chip button{border:0;background:none;color:var(--danger);cursor:pointer;font-size:14px;padding:0 2px}
   .hidden{display:none!important}
-  .filter{margin-bottom:10px}
-  small.hint{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+  .ltr{direction:ltr;unicode-bidi:embed}
+
+  /* expense rows */
+  .exp{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+  .exp:last-child{border-bottom:0}
+  .exp .ic{font-size:26px;width:34px;text-align:center;line-height:1.2}
+  .exp .mid{flex:1;min-width:0}
+  .exp .t{font-weight:650;display:flex;justify-content:space-between;gap:8px}
+  .exp .t .amt{direction:ltr;white-space:nowrap}
+  .exp .s{font-size:13px;color:var(--muted);margin-top:2px}
+  .exp .split{font-size:13px;margin-top:4px}
+  .exp .acts{display:flex;flex-direction:column;gap:4px}
+  .exp .acts button{background:var(--bg);border:1px solid var(--line);border-radius:8px;width:34px;height:32px;cursor:pointer;font-size:15px}
+  .who{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;color:#fff}
+  .who.a{background:var(--a)}.who.b{background:var(--b)}
+  .empty{text-align:center;color:var(--muted);padding:26px 10px}
+
+  /* summary */
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td,th{padding:9px 4px;border-bottom:1px solid var(--line);text-align:start}
+  th{font-size:13px;color:var(--muted);font-weight:600}
+  td.n,th.n{text-align:end;direction:ltr}
+  .total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .total b{font-size:26px;direction:ltr}
+  .result{margin-top:12px;text-align:center;padding:16px;border-radius:12px;background:var(--brand-soft);font-size:18px;font-weight:700;line-height:1.5}
+  .result small{display:block;font-weight:500;font-size:13px;color:var(--muted);margin-top:4px}
+
+  /* modal */
+  .modal{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+  .sheet{background:var(--card);width:100%;max-width:560px;max-height:94vh;overflow:auto;border-radius:18px 18px 0 0;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  @media (min-width:600px){ .modal{align-items:center} .sheet{border-radius:18px} }
+  .sheet .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .sheet .head h3{margin:0;font-size:19px}
+  .x{background:none;border:0;font-size:22px;color:var(--muted);cursor:pointer}
+  .amount{font-size:30px;font-weight:750;text-align:center;direction:ltr}
+
+  .catsel{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--brand);background:var(--brand-soft);border-radius:10px;margin-bottom:8px;font-weight:600}
+  .catlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-height:150px;overflow:auto}
+  .chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:99px;padding:6px 11px;font:inherit;font-size:14px;cursor:pointer}
+  .chip.on{border-color:var(--brand);background:var(--brand-soft);font-weight:650}
+  .chip.add{border-style:dashed;color:var(--brand)}
+  .chip .del{color:var(--danger);margin-inline-start:4px}
+
+  .splitbox{border:1px solid var(--line);border-radius:12px;padding:10px}
+  .splitbox .row label{margin-top:8px}
+  .unit{position:relative}
+  .unit input{padding-inline-end:30px;text-align:center;font-weight:650}
+  .unit span{position:absolute;inset-inline-end:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+  .linkbtn{background:none;border:0;color:var(--brand);font:inherit;font-size:13px;cursor:pointer;padding:0;text-decoration:underline}
+
   .rc{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px}
-  .rc .mid{flex:1;min-width:0}
-  .thumb{width:72px;height:72px;border-radius:8px;background:var(--bg) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer;flex:0 0 72px}
-  .viewer{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.92);display:flex;flex-direction:column}
+  .rc .mid{flex:1}
+  .thumb{width:64px;height:64px;border-radius:8px;background:var(--bg) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;flex:0 0 64px}
+
+  .viewer{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.92);display:flex;flex-direction:column}
   .vbar{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 14px 10px}
   .vbar a,.vbar button{color:#fff;background:rgba(255,255,255,.15);border:0;border-radius:10px;padding:8px 14px;font:inherit;text-decoration:none;cursor:pointer}
   .vbody{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:10px}
   .vbody img{max-width:100%;max-height:100%;object-fit:contain}
   .vbody iframe{width:100%;height:100%;border:0;background:#fff}
+
+  .toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;
+    font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
+  .toast.show{opacity:1}
+  small.hint{display:block;color:var(--muted);font-size:12px;margin-top:4px}
 </style>
 </head>
 <body>
 <header>
-  <h1>💰 ההוצאות של <span id="hdrNames">אור והדר</span></h1>
-  <div id="sync" title="לחצו לסנכרון">…</div>
+  <h1>💰 <span id="hdrNames">אור והדר</span></h1>
+  <div id="sync">…</div>
+  <button id="gear" title="הגדרות">⚙️</button>
 </header>
 
 <main>
-  <!-- ADD / EDIT -->
-  <section id="v-add">
-    <div class="card">
-      <h2 id="formTitle">הוצאה חדשה</h2>
-      <input id="fAmount" class="amount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="₪ 0">
-      <label>קטגוריה</label>
-      <div id="fCats" class="cats"></div>
-      <div class="row">
-        <div><label>תאריך</label><input id="fDate" type="date"></div>
-      </div>
-      <label>מי שילם?</label>
-      <div id="fPayer" class="seg"></div>
-      <label>עבור מי?</label>
-      <div id="fFor" class="seg"></div>
-      <label>הערה (לא חובה)</label>
-      <input id="fNote" type="text" maxlength="120" placeholder="למשל: שופרסל, פיצה האט…">
-      <label>קבלה (לא חובה)</label>
-      <input type="file" id="fReceipt" accept="image/*,application/pdf" class="hidden">
-      <button type="button" class="btn ghost" id="rcPick">📷 צילום / העלאת קבלה</button>
-      <div id="rcPreview" class="rc hidden">
-        <div id="rcThumb" class="thumb"></div>
-        <div class="mid"><div id="rcName" class="muted"></div>
-          <div class="row" style="margin-top:6px">
-            <button type="button" class="btn ghost small" id="rcView">הצגה</button>
-            <button type="button" class="btn danger small" id="rcRemove">הסרה</button>
-          </div></div>
-      </div>
-      <div style="height:14px"></div>
-      <button class="btn" id="fSave">שמירה</button>
-      <div id="editBtns" class="row hidden" style="margin-top:8px">
-        <button class="btn ghost" id="fCancel">ביטול</button>
-        <button class="btn danger" id="fDelete">מחיקה</button>
-      </div>
-    </div>
-  </section>
+  <div class="monthbar">
+    <button id="mPrev" title="חודש קודם">›</button>
+    <h2 id="monthTitle"></h2>
+    <button id="mNext" title="חודש הבא">‹</button>
+  </div>
 
-  <!-- LIST -->
-  <section id="v-list" class="hidden">
-    <div class="monthbar"><button data-m="1">›</button><b class="mlabel"></b><button data-m="-1">‹</button></div>
-    <div class="card">
-      <select id="lFilter" class="filter"></select>
-      <div id="lTotal" class="muted"></div>
-      <div id="lItems"></div>
-    </div>
-  </section>
+  <button class="btn big" id="addBtn">➕ הוסף הוצאה</button>
 
-  <!-- SUMMARY -->
-  <section id="v-sum" class="hidden">
-    <div class="monthbar"><button data-m="1">›</button><b class="mlabel"></b><button data-m="-1">‹</button></div>
-    <div class="card">
-      <h2>סה"כ הוצאות בחודש</h2>
-      <div class="big" id="sTotal"></div>
-      <div class="muted" style="text-align:center" id="sCount"></div>
-    </div>
-    <div class="card">
-      <h2>יחס החלוקה לחודש הזה</h2>
-      <div class="ratio">
-        <span class="lbl" id="sRa"></span>
-        <input type="range" id="sRatio" min="0" max="100" step="5">
-        <span class="lbl" id="sRb"></span>
-      </div>
-      <small class="hint" id="sRatioHint"></small>
-      <div style="height:12px"></div>
-      <div class="settle" id="sSettle"></div>
-      <div style="height:10px"></div>
-      <table id="sTable"></table>
-      <div style="height:12px"></div>
-      <button class="btn ghost" id="sSettledBtn"></button>
-    </div>
-    <div class="card">
-      <h2>לפי קטגוריה</h2>
-      <div id="sCats"></div>
-    </div>
-    <div class="card">
-      <h2>6 חודשים אחרונים</h2>
-      <div id="sTrend"></div>
-    </div>
-  </section>
+  <div class="card">
+    <div id="rows"></div>
+  </div>
 
-  <!-- SETTINGS -->
-  <section id="v-set" class="hidden">
-    <div class="card">
-      <h2>אני…</h2>
-      <div id="setMe" class="seg"></div>
-      <small class="hint">קובע מי יופיע כברירת מחדל כ"מי שילם" במכשיר הזה.</small>
-    </div>
-    <div class="card">
-      <h2>שמות</h2>
-      <div class="row">
-        <div><label>אדם 1</label><input id="setNameA"></div>
-        <div><label>אדם 2</label><input id="setNameB"></div>
-      </div>
-      <div style="height:10px"></div>
-      <button class="btn small" id="setNamesSave">שמירת שמות</button>
-    </div>
-    <div class="card">
-      <h2>יחס חלוקה ברירת מחדל</h2>
-      <div class="ratio">
-        <span class="lbl" id="setRa"></span>
-        <input type="range" id="setRatio" min="0" max="100" step="5">
-        <span class="lbl" id="setRb"></span>
-      </div>
-      <small class="hint">חל על כל חודש שלא נקבע לו יחס משלו (אפשר לקבע יחס לחודש מסוים במסך "סיכום").</small>
-    </div>
-    <div class="card">
-      <h2>קטגוריות</h2>
-      <div id="setCats" class="chips"></div>
-      <div class="row" style="margin-top:10px">
-        <input id="newCatIcon" placeholder="🙂" maxlength="4" style="flex:0 0 64px;text-align:center">
-        <input id="newCatName" placeholder="שם קטגוריה">
-        <button class="btn small" id="addCat" style="flex:0 0 auto">הוספה</button>
-      </div>
-    </div>
-    <div class="card">
-      <h2>סנכרון משותף דרך GitHub</h2>
-      <div class="muted" id="ghState"></div>
-      <label>שם משתמש / ארגון ב-GitHub (owner)</label><input id="ghOwner" dir="ltr" autocomplete="off">
-      <label>שם ה-repository של הנתונים</label><input id="ghRepo" dir="ltr" autocomplete="off" placeholder="OH-data">
-      <label>שם הקובץ</label><input id="ghPath" dir="ltr" autocomplete="off" placeholder="expenses.json">
-      <label>Token (Fine-grained, הרשאת Contents: Read and write)</label>
-      <input id="ghToken" dir="ltr" type="password" autocomplete="off" placeholder="github_pat_…">
-      <small class="hint">ה-Token נשמר רק במכשיר הזה (localStorage) ונשלח רק ל-api.github.com.</small>
-      <div style="height:10px"></div>
-      <div class="row">
-        <button class="btn" id="ghConnect">חיבור וסנכרון</button>
-        <button class="btn ghost" id="ghDisconnect">ניתוק</button>
-      </div>
-      <div id="ghMigrate" class="hidden" style="margin-top:10px">
-        <button class="btn ghost" id="ghUpload">העלאת ההוצאות שנשמרו מקומית ל-GitHub</button>
-      </div>
-    </div>
-    <div class="card">
-      <h2>גיבוי</h2>
-      <div class="row">
-        <button class="btn ghost" id="expCsv">ייצוא CSV</button>
-        <button class="btn ghost" id="expJson">ייצוא JSON</button>
-      </div>
-    </div>
-  </section>
+  <div class="card" id="sumCard">
+    <h3>סיכום החודש</h3>
+    <div class="total"><span>שילמנו ביחד</span><b id="sTotal"></b></div>
+    <table id="sTable"></table>
+    <div style="height:12px"></div>
+    <button class="btn" id="calcBtn">🧮 חישוב</button>
+    <div id="result" class="result hidden"></div>
+  </div>
 </main>
 
-<nav>
-  <button data-v="add" class="on"><span>➕</span>הוספה</button>
-  <button data-v="list"><span>📋</span>רשימה</button>
-  <button data-v="sum"><span>📊</span>סיכום</button>
-  <button data-v="set"><span>⚙️</span>הגדרות</button>
-</nav>
+<!-- Add / edit expense -->
+<div id="expModal" class="modal hidden">
+  <div class="sheet">
+    <div class="head"><h3 id="mTitle">הוצאה חדשה</h3><button class="x" data-close>✕</button></div>
+
+    <label>סכום</label>
+    <input id="fAmount" class="amount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="₪ 0">
+
+    <label>סוג</label>
+    <div id="catSel" class="catsel"></div>
+    <input id="catSearch" type="search" placeholder="🔍 חיפוש סוג…" autocomplete="off">
+    <div id="catList" class="catlist"></div>
+
+    <label>חלוקה</label>
+    <div class="splitbox">
+      <div class="seg" id="splitMode"></div>
+      <div class="row">
+        <div><label id="lblA"></label><div class="unit"><input id="sA" type="number" inputmode="decimal" step="0.01" min="0"><span class="u"></span></div></div>
+        <div><label id="lblB"></label><div class="unit"><input id="sB" type="number" inputmode="decimal" step="0.01" min="0"><span class="u"></span></div></div>
+      </div>
+      <div class="muted" id="splitInfo" style="margin-top:8px"></div>
+      <button type="button" class="linkbtn" id="splitReset"></button>
+    </div>
+
+    <label>מי שילם?</label>
+    <div id="fPayer" class="seg"></div>
+
+    <div class="row">
+      <div><label>תאריך</label><input id="fDate" type="date"></div>
+      <div><label>הערה (לא חובה)</label><input id="fNote" type="text" maxlength="120" placeholder="למשל: שופרסל"></div>
+    </div>
+
+    <label>קבלה (לא חובה)</label>
+    <input type="file" id="fReceipt" accept="image/*,application/pdf" class="hidden">
+    <button type="button" class="btn ghost" id="rcPick">📷 העלאת קבלה</button>
+    <div id="rcPreview" class="rc hidden">
+      <div id="rcThumb" class="thumb"></div>
+      <div class="mid"><div id="rcName" class="muted"></div>
+        <div class="row" style="margin-top:6px">
+          <button type="button" class="btn ghost small" id="rcView">הצגה</button>
+          <button type="button" class="btn danger small" id="rcRemove">הסרה</button>
+        </div></div>
+    </div>
+
+    <div style="height:16px"></div>
+    <div class="row">
+      <button class="btn ghost" data-close>ביטול</button>
+      <button class="btn" id="fSave">אישור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div id="setModal" class="modal hidden">
+  <div class="sheet">
+    <div class="head"><h3>הגדרות</h3><button class="x" data-close>✕</button></div>
+
+    <label>מי משתמש בטלפון הזה?</label>
+    <div id="setMe" class="seg"></div>
+
+    <label>שמות</label>
+    <div class="row"><input id="setNameA"><input id="setNameB"></div>
+    <div style="height:8px"></div>
+    <button class="btn small" id="setNamesSave">שמירת שמות</button>
+
+    <label>יחס חלוקה ברירת מחדל</label>
+    <div class="row">
+      <div class="unit"><input id="setPctA" type="number" min="0" max="100" step="1"><span>%</span></div>
+      <div class="unit"><input id="setPctB" type="number" min="0" max="100" step="1" disabled><span>%</span></div>
+    </div>
+    <small class="hint" id="setRatioHint"></small>
+
+    <label>סוגי הוצאות</label>
+    <div id="setCats" class="catlist" style="max-height:none"></div>
+    <small class="hint">כדי להוסיף סוג חדש: מקלידים אותו בחיפוש בזמן הוספת הוצאה.</small>
+
+    <label>סנכרון משותף (GitHub)</label>
+    <div class="muted" id="ghState"></div>
+    <input id="ghOwner" dir="ltr" autocomplete="off" placeholder="owner (sallaryandpension)" style="margin-top:6px">
+    <input id="ghRepo" dir="ltr" autocomplete="off" placeholder="repository (OH-data)" style="margin-top:6px">
+    <input id="ghPath" dir="ltr" autocomplete="off" placeholder="expenses.json" style="margin-top:6px">
+    <input id="ghToken" dir="ltr" type="password" autocomplete="off" placeholder="Token: github_pat_…" style="margin-top:6px">
+    <small class="hint">ה-Token נשמר רק בטלפון הזה ונשלח רק ל-api.github.com.</small>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="ghConnect">חיבור</button>
+      <button class="btn ghost" id="ghDisconnect">ניתוק</button>
+    </div>
+    <div id="ghMigrate" class="hidden" style="margin-top:8px">
+      <button class="btn ghost" id="ghUpload">העלאת הוצאות שנשמרו מקומית</button>
+    </div>
+
+    <label>גיבוי</label>
+    <div class="row">
+      <button class="btn ghost" id="expCsv">ייצוא CSV</button>
+      <button class="btn ghost" id="expJson">ייצוא JSON</button>
+    </div>
+  </div>
+</div>
+
+<!-- First run: who am I -->
+<div id="meModal" class="modal hidden">
+  <div class="sheet" style="text-align:center">
+    <h3 style="margin:6px 0 14px">מי משתמש בטלפון הזה?</h3>
+    <div class="row"><button class="btn" data-me="a"></button><button class="btn" data-me="b" style="background:var(--b)"></button></div>
+    <small class="hint" style="margin-top:10px">אפשר לשנות אחר כך בהגדרות.</small>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div id="viewer" class="viewer hidden">
   <div class="vbar"><a id="viewerOpen" target="_blank" rel="noopener">פתיחה / שמירה</a><button id="viewerClose">✕ סגירה</button></div>
@@ -267,58 +269,61 @@
 
 <script>
 "use strict";
-/* ================= Data model =================
-   data = { version, settings:{ names:{a,b}, defaultRatio (percent paid by a),
-            categories:[{id,name,icon}], monthRatios:{ 'YYYY-MM': n }, settled:{ 'YYYY-MM': true } },
-            expenses:[{ id, date:'YYYY-MM-DD', amount, cat, payer:'a'|'b', forWhom:'shared'|'a'|'b', note, by, ts }] }
-*/
+/* data = { version:2, settings:{ names:{a,b}, defaultPctA, categories:[{id,name,icon}] },
+            expenses:[{ id, date, amount, cat, pctA, shareA, splitMode:'pct'|'amt', payer:'a'|'b', note, receipt, by, ts }] }
+   a = אור, b = הדר. shareA = החלק של אור בשקלים, החלק של הדר = amount - shareA. */
 const DEFAULT_CATS = [
   ['super','סופר','🛒'],['fast','מזון מהיר','🍔'],['icecream','גלידה','🍦'],['rest','מסעדה','🍽️'],
   ['coffee','קפה','☕'],['delivery','משלוחים','🛵'],['fuel','דלק','⛽'],['transport','תחבורה','🚌'],
-  ['home','בית','🏠'],['bills','חשבונות','💡'],['fun','בילויים','🎬'],['clothes','ביגוד','👕'],
-  ['health','בריאות','💊'],['gifts','מתנות','🎁'],['travel','חופשה','✈️'],['other','אחר','📦']
+  ['parking','חניה','🅿️'],['home','בית','🏠'],['rent','שכירות','🔑'],['bills','חשבונות','💡'],
+  ['fun','בילויים','🎬'],['clothes','ביגוד','👕'],['health','בריאות','💊'],['pharm','פארם','🧴'],
+  ['gifts','מתנות','🎁'],['travel','חופשה','✈️'],['pets','חיות מחמד','🐶'],['other','אחר','📦']
 ].map(([id,name,icon])=>({id,name,icon}));
+const DEFAULT_PCT_A = 80;   // 1:4 → על כל שקל של הדר, 4 של אור
+const VERB = { a:{owe:'צריך', you:'אתה צריך', youGet:'אתה צריך לקבל'}, b:{owe:'צריכה', you:'את צריכה', youGet:'את צריכה לקבל'} };
 
-function freshData(){
-  return { version:1, settings:{ names:{a:'אור',b:'הדר'}, defaultRatio:50,
-    categories:JSON.parse(JSON.stringify(DEFAULT_CATS)), monthRatios:{}, settled:{} }, expenses:[] };
-}
+function freshData(){ return { version:2, settings:{ names:{a:'אור',b:'הדר'}, defaultPctA:DEFAULT_PCT_A,
+  categories:JSON.parse(JSON.stringify(DEFAULT_CATS)) }, expenses:[] }; }
 function normalize(d){
   const f = freshData();
   if(!d || typeof d!=='object') return f;
-  d.settings = Object.assign(f.settings, d.settings||{});
-  d.settings.names = Object.assign({a:'אור',b:'הדר'}, d.settings.names||{});
-  if(!Array.isArray(d.settings.categories) || !d.settings.categories.length) d.settings.categories = f.settings.categories;
-  d.settings.monthRatios = d.settings.monthRatios||{};
-  d.settings.settled = d.settings.settled||{};
-  if(typeof d.settings.defaultRatio!=='number') d.settings.defaultRatio = 50;
+  const s = d.settings = Object.assign(f.settings, d.settings||{});
+  s.names = Object.assign({a:'אור',b:'הדר'}, s.names||{});
+  if(!Array.isArray(s.categories) || !s.categories.length) s.categories = f.settings.categories;
+  if(typeof s.defaultPctA!=='number') s.defaultPctA = DEFAULT_PCT_A;
   d.expenses = Array.isArray(d.expenses)? d.expenses : [];
-  d.version = 1;
+  for(const e of d.expenses){          // older rows (v1) → per-row split
+    if(typeof e.shareA!=='number'){
+      const f2 = e.forWhom||'shared';
+      e.pctA = f2==='a'?100 : f2==='b'?0 : (typeof e.pctA==='number'? e.pctA : 50);
+      e.shareA = Math.round(e.amount*e.pctA)/100; e.splitMode='pct';
+    }
+  }
+  d.version = 2;
   return d;
 }
 
-/* ================= Storage ================= */
+/* ================= Storage & GitHub sync ================= */
 const LS = { cfg:'oh_gh_cfg', me:'oh_me', local:'oh_local_data', cache:'oh_cache' };
-let cfg = JSON.parse(localStorage.getItem(LS.cfg)||'null');   // {owner,repo,path,token}
-let me = localStorage.getItem(LS.me)||'a';
+let cfg = JSON.parse(localStorage.getItem(LS.cfg)||'null');
+let me = localStorage.getItem(LS.me);
 let data = normalize(JSON.parse(localStorage.getItem(cfg? LS.cache : LS.local)||'null'));
-let sha = null;
-let busy = false;
+let busy = false, etag = null;
 
-function ghUrl(){ return `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path.split('/').map(encodeURIComponent).join('/')}`; }
+function ghUrlFor(path){ return `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${path.split('/').map(encodeURIComponent).join('/')}`; }
+const ghUrl = () => ghUrlFor(cfg.path);
 function ghHeaders(){ return { 'Authorization':'Bearer '+cfg.token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' }; }
-function b64encode(str){
-  const bytes = new TextEncoder().encode(str); let bin='';
-  for(let i=0;i<bytes.length;i+=0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000));
-  return btoa(bin);
+function b64encode(str){ const bytes=new TextEncoder().encode(str); let bin='';
+  for(let i=0;i<bytes.length;i+=0x8000) bin+=String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000)); return btoa(bin); }
+function b64decode(b64){ const bin=atob(b64.replace(/\s/g,'')); const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); }
+async function errText(r){
+  let m=''; try{ m=(await r.json()).message }catch(e){}
+  if(r.status===401) return 'Token לא תקין או שפג תוקפו';
+  if(r.status===403) return 'אין הרשאה (צריך Contents: Read and write) '+m;
+  if(r.status===404) return 'ה-repository לא נמצא או שאין גישה אליו';
+  return `GitHub ${r.status}: ${m}`;
 }
-function b64decode(b64){
-  const bin = atob(b64.replace(/\s/g,'')); const bytes = new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
-}
-let etag = null;
-/* conditional=true → sends If-None-Match; GitHub answers 304 (free, not counted in rate limit) when nothing changed */
 async function ghFetch(conditional){
   const h = ghHeaders(); if(conditional && etag) h['If-None-Match'] = etag;
   const r = await fetch(ghUrl()+'?nocache='+Date.now(), { headers:h, cache:'no-store' });
@@ -329,65 +334,53 @@ async function ghFetch(conditional){
   const j = await r.json();
   return { d:normalize(JSON.parse(b64decode(j.content)||'null')), sha:j.sha };
 }
-function ghUrlFor(path){ return `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${path.split('/').map(encodeURIComponent).join('/')}`; }
+async function ghPut(d, curSha, msg){
+  const body = { message:msg, content:b64encode(JSON.stringify(d,null,1)) }; if(curSha) body.sha = curSha;
+  const r = await fetch(ghUrl(), { method:'PUT', headers:Object.assign({'Content-Type':'application/json'},ghHeaders()), body:JSON.stringify(body) });
+  if(r.status===409 || r.status===422) return { conflict:true };
+  if(!r.ok) throw new Error(await errText(r));
+  return { sha:(await r.json()).content.sha };
+}
 async function ghPutRaw(path, b64, msg){
   const r = await fetch(ghUrlFor(path), { method:'PUT', headers:Object.assign({'Content-Type':'application/json'},ghHeaders()), body:JSON.stringify({message:msg, content:b64}) });
   if(!r.ok) throw new Error(await errText(r));
 }
 async function ghGetRaw(path){
-  const h = ghHeaders(); h.Accept = 'application/vnd.github.raw+json';
+  const h = ghHeaders(); h.Accept='application/vnd.github.raw+json';
   const r = await fetch(ghUrlFor(path), { headers:h, cache:'no-store' });
   if(!r.ok) throw new Error(await errText(r));
-  return await r.blob();
+  return r.blob();
 }
 async function ghDeleteFile(path){
-  const r = await fetch(ghUrlFor(path), { headers:ghHeaders(), cache:'no-store' });
-  if(!r.ok) return;
+  const r = await fetch(ghUrlFor(path), { headers:ghHeaders(), cache:'no-store' }); if(!r.ok) return;
   const j = await r.json();
   await fetch(ghUrlFor(path), { method:'DELETE', headers:Object.assign({'Content-Type':'application/json'},ghHeaders()), body:JSON.stringify({message:'מחיקת קבלה', sha:j.sha}) });
 }
-async function errText(r){
-  let m=''; try{ m=(await r.json()).message }catch(e){}
-  if(r.status===401) return 'Token לא תקין או שפג תוקפו';
-  if(r.status===403) return 'אין הרשאה (בדקו שה-Token כולל Contents: Read and write) '+m;
-  if(r.status===404) return 'ה-repository לא נמצא או שאין גישה אליו';
-  return `GitHub ${r.status}: ${m}`;
-}
-async function ghPut(d, curSha, msg){
-  const body = { message: msg, content: b64encode(JSON.stringify(d,null,1)) };
-  if(curSha) body.sha = curSha;
-  const r = await fetch(ghUrl(), { method:'PUT', headers:Object.assign({'Content-Type':'application/json'},ghHeaders()), body:JSON.stringify(body) });
-  if(r.status===409 || r.status===422) return { conflict:true };
-  if(!r.ok) throw new Error(await errText(r));
-  const j = await r.json(); return { sha:j.content.sha };
-}
 
-/* Apply a change. In GitHub mode: re-read latest file, apply op, write with sha; retry on conflict.
-   This way two people saving at the same time never overwrite each other. */
+/* Every change re-reads the latest file, applies the change and writes with its sha.
+   If the other phone saved in the meantime → conflict → retry. Nothing is overwritten. */
 const queue = [];
 function change(op, msg){
   op(data); persistLocal(); render();
   if(!cfg) return Promise.resolve();
-  return new Promise((res)=>{ queue.push({op,msg,res}); pump(); });
+  return new Promise(res=>{ queue.push({op,msg,res}); pump(); });
 }
 async function pump(){
   if(busy || !queue.length) return;
   busy = true; setSync('saving');
   while(queue.length){
-    const job = queue[0];
-    let ok=false, err=null;
-    for(let attempt=0; attempt<6 && !ok; attempt++){
+    const job = queue[0]; let ok=false, err=null;
+    for(let i=0;i<6 && !ok;i++){
       try{
-        const { d, sha:s } = await ghFetch();
+        const { d, sha:s } = await ghFetch(false);
         job.op(d);
         const put = await ghPut(d, s, job.msg);
         if(put.conflict){ await sleep(300+Math.random()*700); continue; }
-        sha = put.sha; ok = true;
-        if(queue.length===1){ data = d; }   // take server state once nothing else is pending
+        ok = true; if(queue.length===1) data = d;
       }catch(e){ err=e; break; }
     }
     queue.shift(); job.res();
-    if(!ok){ busy=false; setSync('error', err? err.message : 'התנגשות חוזרת, נסו שוב'); toast('⚠️ השמירה ל-GitHub נכשלה: '+(err?err.message:'נסו שוב')); await refresh(true); return; }
+    if(!ok){ busy=false; setSync('error', err?err.message:''); toast('⚠️ השמירה נכשלה: '+(err?err.message:'נסו שוב')); await refresh(true); return; }
   }
   busy=false; persistLocal(); render(); setSync('ok');
 }
@@ -398,9 +391,7 @@ async function refresh(silent){
   try{
     const res = await ghFetch(silent);
     if(busy) return;
-    if(res.notModified){ setSync('ok'); return; }
-    data = res.d; sha = res.sha; persistLocal();
-    if(view!=='set' || !silent) render();   // don't overwrite fields the user is typing in settings
+    if(!res.notModified){ data = res.d; persistLocal(); render(); }
     setSync('ok');
   }catch(e){ setSync('error', e.message); }
 }
@@ -411,7 +402,8 @@ const sleep = ms => new Promise(r=>setTimeout(r,ms));
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmt = n => '₪' + (Math.round(n*100)/100).toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2});
+const r2 = n => Math.round(n*100)/100;
+const fmt = n => '₪' + r2(n).toLocaleString('he-IL',{maximumFractionDigits:2});
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
 const MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
@@ -419,118 +411,228 @@ const mLabel = m => { const [y,mm]=m.split('-'); return MONTHS[+mm-1]+' '+y; };
 const shiftMonth = (m,k) => { let [y,mm]=m.split('-').map(Number); mm+=k; while(mm<1){mm+=12;y--} while(mm>12){mm-=12;y++} return `${y}-${String(mm).padStart(2,'0')}`; };
 const N = () => data.settings.names;
 const catOf = id => data.settings.categories.find(c=>c.id===id) || {id, name:'אחר', icon:'📦'};
-const ratioFor = m => (data.settings.monthRatios[m] ?? data.settings.defaultRatio);
+function ratioText(p){            // 80 → "1:4"
+  const a=p, b=100-p; if(!a||!b) return a? `הכל על ${N().a}` : `הכל על ${N().b}`;
+  const g=(x,y)=>y?g(y,x%y):x; const k=g(Math.round(a),Math.round(b));
+  return `על כל ₪${Math.round(b)/k} של ${N().b}, ₪${Math.round(a)/k} של ${N().a}`;
+}
 function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('show'),2600); }
-function setSync(state, msg){
-  const el=$('#sync');
-  el.textContent = { ok:'✓ מסונכרן', saving:'⏳ שומר…', loading:'⏳ טוען…', local:'📱 שמירה מקומית', error:'⚠️ שגיאת סנכרון' }[state];
-  el.title = msg || 'לחצו לסנכרון';
+function setSync(state,msg){
+  $('#sync').textContent = { ok:'✓ מסונכרן', saving:'⏳ שומר…', loading:'⏳ טוען…', local:'📱 מקומי', error:'⚠️ שגיאה' }[state];
+  $('#sync').title = msg||'';
 }
-
-/* ================= State ================= */
-let view = 'add';
-let month = todayStr().slice(0,7);
-let form = { id:null, cat:'super', payer:me, forWhom:'shared', receipt:null, newReceipt:null, removeReceipt:false };
-let listFilter = '';
-
-/* ================= Rendering ================= */
-function render(){
-  const n = N();
-  $('#hdrNames').textContent = `${n.a} ו${n.b}`;
-  document.title = `ההוצאות של ${n.a} ו${n.b}`;
-  $$('.mlabel').forEach(e=>e.textContent=mLabel(month));
-  if(view==='add') renderForm();
-  if(view==='list') renderList();
-  if(view==='sum') renderSum();
-  if(view==='set') renderSettings();
-}
-
 function seg(el, opts, val, onPick){
   el.innerHTML = opts.map(([v,t])=>`<button type="button" data-v="${v}" class="${v===val?'on':''}">${esc(t)}</button>`).join('');
   el.onclick = e => { const b=e.target.closest('button'); if(b) onPick(b.dataset.v); };
 }
+function openModal(id){ $(id).classList.remove('hidden'); document.body.classList.add('lock'); }
+function closeModal(id){ $(id).classList.add('hidden'); if(!$$('.modal:not(.hidden)').length) document.body.classList.remove('lock'); }
+$$('[data-close]').forEach(b=>b.onclick = () => closeModal('#'+b.closest('.modal').id));
+$$('.modal').forEach(m=>m.addEventListener('click', e=>{ if(e.target===m && m.id!=='meModal') closeModal('#'+m.id); }));
 
-function renderForm(){
+/* ================= Main screen ================= */
+let month = todayStr().slice(0,7);
+const monthExpenses = m => data.expenses.filter(e=>e.date && e.date.slice(0,7)===m);
+
+function calcMonth(m){
+  let total=0, paidA=0, paidB=0, shareA=0;
+  for(const e of monthExpenses(m)){
+    total+=e.amount; shareA+=e.shareA;
+    if(e.payer==='a') paidA+=e.amount; else paidB+=e.amount;
+  }
+  const shareB = total-shareA;
+  return { total, paidA, paidB, shareA, shareB, balA: r2(paidA-shareA) };  // balA>0 → הדר מעבירה לאור
+}
+
+function render(){
   const n=N();
-  $('#fCats').innerHTML = data.settings.categories.map(c=>
-    `<div class="cat ${c.id===form.cat?'on':''}" data-id="${esc(c.id)}"><span class="ic">${esc(c.icon)}</span>${esc(c.name)}</div>`).join('');
-  seg($('#fPayer'), [['a',n.a],['b',n.b]], form.payer, v=>{form.payer=v; renderForm();});
-  seg($('#fFor'), [['shared','משותף'],['a',n.a+' בלבד'],['b',n.b+' בלבד']], form.forWhom, v=>{form.forWhom=v; renderForm();});
-  $('#formTitle').textContent = form.id? 'עריכת הוצאה' : 'הוצאה חדשה';
-  $('#editBtns').classList.toggle('hidden', !form.id);
-}
-$('#fCats').addEventListener('click', e=>{ const c=e.target.closest('.cat'); if(c){ form.cat=c.dataset.id; renderForm(); } });
+  $('#hdrNames').textContent = `${n.a} ו${n.b}`;
+  document.title = `ההוצאות של ${n.a} ו${n.b}`;
+  $('#monthTitle').textContent = 'הוצאות החודש ' + mLabel(month);
 
-function resetForm(){
-  if(form.newReceipt) URL.revokeObjectURL(form.newReceipt.url);
-  form = { id:null, cat:form.cat, payer:me, forWhom:'shared', receipt:null, newReceipt:null, removeReceipt:false };
-  $('#fAmount').value=''; $('#fNote').value=''; $('#fDate').value=todayStr(); $('#fReceipt').value='';
-  renderReceipt();
+  const items = monthExpenses(month).sort((x,y)=> y.date.localeCompare(x.date) || y.ts-x.ts);
+  $('#rows').innerHTML = !items.length ? `<div class="empty">עוד אין הוצאות בחודש הזה.<br>לחצו על "הוסף הוצאה" כדי להתחיל.</div>`
+    : items.map(e=>{
+      const c=catOf(e.cat), [,mm,dd]=e.date.split('-');
+      const sB=r2(e.amount-e.shareA);
+      return `<div class="exp" data-id="${esc(e.id)}">
+        <div class="ic">${esc(c.icon)}</div>
+        <div class="mid">
+          <div class="t"><span>${esc(c.name)}${e.receipt?' 🧾':''}</span><span class="amt">${fmt(e.amount)}</span></div>
+          <div class="s">${+dd}.${+mm} · שילם/ה: <span class="who ${e.payer}">${esc(n[e.payer])}</span>${e.note?' · '+esc(e.note):''}</div>
+          <div class="split">${esc(n.a)} <b class="ltr">${fmt(e.shareA)}</b> · ${esc(n.b)} <b class="ltr">${fmt(sB)}</b>
+            <span class="muted">(${Math.round(e.pctA)}% / ${Math.round(100-e.pctA)}%)</span></div>
+        </div>
+        <div class="acts"><button data-act="edit" title="עריכה">✏️</button><button data-act="del" title="מחיקה">🗑️</button></div>
+      </div>`; }).join('');
+
+  const c = calcMonth(month);
+  $('#sTotal').textContent = fmt(c.total);
+  $('#sTable').innerHTML = `<tr><th></th><th class="n">${esc(n.a)}</th><th class="n">${esc(n.b)}</th></tr>
+    <tr><td>שילם/ה בפועל</td><td class="n">${fmt(c.paidA)}</td><td class="n">${fmt(c.paidB)}</td></tr>
+    <tr><td>היה צריך לשלם לפי היחס</td><td class="n">${fmt(c.shareA)}</td><td class="n">${fmt(c.shareB)}</td></tr>`;
+  if(!$('#result').classList.contains('hidden')) showResult();
+}
+function showResult(){
+  const n=N(), c=calcMonth(month), el=$('#result');
+  el.classList.remove('hidden');
+  if(!c.total){ el.innerHTML='אין הוצאות בחודש הזה'; return; }
+  if(Math.abs(c.balA)<1){ el.innerHTML='🤝 אתם מאוזנים, אין צורך בהעברה'; return; }
+  const from = c.balA>0 ? 'b' : 'a', to = from==='a' ? 'b' : 'a', amt = fmt(Math.abs(c.balA));
+  let personal = '';
+  if(me===from) personal = `👉 ${VERB[me].you} להעביר ל${esc(n[to])} <span class="ltr">${amt}</span>`;
+  else if(me===to) personal = `👉 ${VERB[me].youGet} מ${esc(n[from])} <span class="ltr">${amt}</span>`;
+  el.innerHTML = `${esc(n[from])} ${VERB[from].owe} להעביר ל${esc(n[to])} <span class="ltr">${amt}</span>`
+    + (personal? `<small>${personal}</small>` : '');
+}
+$('#calcBtn').onclick = () => { showResult(); $('#result').scrollIntoView({behavior:'smooth', block:'nearest'}); };
+$('#mPrev').onclick = () => { month=shiftMonth(month,-1); $('#result').classList.add('hidden'); render(); };
+$('#mNext').onclick = () => { month=shiftMonth(month,1); $('#result').classList.add('hidden'); render(); };
+$('#rows').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return;
+  const id=b.closest('.exp').dataset.id;
+  if(b.dataset.act==='edit') openExpense(id); else deleteExpense(id);
+});
+async function deleteExpense(id){
+  const e=data.expenses.find(x=>x.id===id); if(!e) return;
+  if(!confirm(`למחוק את ההוצאה "${catOf(e.cat).name}" על ${fmt(e.amount)}?`)) return;
+  toast('נמחק');
+  await change(d=>{ d.expenses=d.expenses.filter(x=>x.id!==id); }, 'מחיקת הוצאה');
+  dropReceipt(e.receipt);
 }
 
-/* ---------- Receipts ----------
-   GitHub mode: saved as a file in the same repo, under receipts/ next to the data file.
-   Local mode: saved in this device's storage (limited space, about 20 photos). */
-const rcCache = {};  // path -> object URL
-const isPdfPath = p => /\.pdf$/i.test(p) || /^data:application\/pdf/.test(localStorage.getItem((p||'').slice(6))||'');
+/* ================= Add / edit window ================= */
+let form = null;
+$('#addBtn').onclick = () => openExpense(null);
+function openExpense(id){
+  const e = id && data.expenses.find(x=>x.id===id);
+  const defDate = month===todayStr().slice(0,7) ? todayStr() : month+'-01';
+  form = e ? { id:e.id, cat:e.cat, payer:e.payer, pctA:e.pctA, mode:e.splitMode||'pct', receipt:e.receipt||null, newReceipt:null, removeReceipt:false }
+           : { id:null, cat:null, payer:me||'a', pctA:data.settings.defaultPctA, mode:'pct', receipt:null, newReceipt:null, removeReceipt:false };
+  $('#mTitle').textContent = e? 'עריכת הוצאה' : 'הוצאה חדשה';
+  $('#fAmount').value = e? e.amount : '';
+  $('#fDate').value = e? e.date : defDate;
+  $('#fNote').value = e? (e.note||'') : '';
+  $('#catSearch').value = '';
+  renderCats(); renderSplit(); renderPayer(); renderReceipt();
+  openModal('#expModal');
+  if(!e) setTimeout(()=>$('#fAmount').focus(), 50);
+}
+
+/* category search */
+function renderCats(){
+  const q = $('#catSearch').value.trim();
+  const cats = data.settings.categories;
+  const sel = form.cat && catOf(form.cat);
+  $('#catSel').innerHTML = sel ? `<span style="font-size:22px">${esc(sel.icon)}</span> ${esc(sel.name)}` : '<span class="muted">לא נבחר סוג</span>';
+  const list = q ? cats.filter(c=>c.name.includes(q)) : cats;
+  let html = list.map(c=>`<button type="button" class="chip ${c.id===form.cat?'on':''}" data-id="${esc(c.id)}">${esc(c.icon)} ${esc(c.name)}</button>`).join('');
+  if(q && !cats.some(c=>c.name===q)) html += `<button type="button" class="chip add" data-new="1">➕ הוספת סוג "${esc(q)}"</button>`;
+  $('#catList').innerHTML = html || '<span class="muted">לא נמצא</span>';
+}
+$('#catSearch').oninput = renderCats;
+$('#catList').onclick = e => {
+  const b=e.target.closest('.chip'); if(!b) return;
+  if(b.dataset.new){
+    const name=$('#catSearch').value.trim(), id='c'+uid();
+    const icon = prompt(`אימוג'י לסוג "${name}" (לא חובה):`, '🏷️') || '🏷️';
+    change(d=>{ d.settings.categories.push({id,name,icon:icon.trim().slice(0,4)}); }, 'סוג חדש: '+name);
+    form.cat=id;
+  } else form.cat=b.dataset.id;
+  $('#catSearch').value=''; renderCats();
+};
+
+/* split: percent or amount */
+const amountVal = () => parseFloat($('#fAmount').value)||0;
+function renderSplit(){
+  const n=N();
+  seg($('#splitMode'), [['pct','באחוזים %'],['amt','בסכום ₪']], form.mode, v=>{ form.mode=v; renderSplit(); });
+  $('#lblA').textContent=n.a; $('#lblB').textContent=n.b;
+  $$('.splitbox .u').forEach(u=>u.textContent = form.mode==='pct'?'%':'₪');
+  fillSplitInputs();
+  const def=data.settings.defaultPctA;
+  $('#splitReset').textContent = `חזרה לברירת המחדל (${ratioText(def)})`;
+  $('#splitReset').classList.toggle('hidden', Math.abs(form.pctA-def)<0.01);
+}
+function fillSplitInputs(skip){
+  const amt=amountVal(), a=$('#sA'), b=$('#sB');
+  if(form.mode==='pct'){
+    if(skip!=='a') a.value = r2(form.pctA); if(skip!=='b') b.value = r2(100-form.pctA);
+  } else {
+    const sa=r2(amt*form.pctA/100);
+    if(skip!=='a') a.value = amt? sa : ''; if(skip!=='b') b.value = amt? r2(amt-sa) : '';
+  }
+  const sa=r2(amt*form.pctA/100);
+  $('#splitInfo').innerHTML = amt
+    ? `${esc(N().a)} <b class="ltr">${fmt(sa)}</b> · ${esc(N().b)} <b class="ltr">${fmt(amt-sa)}</b> · ${esc(ratioText(form.pctA))}`
+    : esc(ratioText(form.pctA));
+}
+function onSplitInput(who){
+  const amt=amountVal(), v=parseFloat((who==='a'?$('#sA'):$('#sB')).value);
+  if(isNaN(v)) return;
+  let pA;
+  if(form.mode==='pct') pA = who==='a'? v : 100-v;
+  else { if(!amt){ toast('קודם מזינים סכום'); return; } pA = (who==='a'? v : amt-v)/amt*100; }
+  form.pctA = Math.min(100, Math.max(0, pA));
+  fillSplitInputs(who);
+  $('#splitReset').classList.toggle('hidden', Math.abs(form.pctA-data.settings.defaultPctA)<0.01);
+}
+$('#sA').oninput = () => onSplitInput('a');
+$('#sB').oninput = () => onSplitInput('b');
+$('#sA').onblur = $('#sB').onblur = () => fillSplitInputs();
+$('#fAmount').oninput = () => fillSplitInputs();
+$('#splitReset').onclick = () => { form.pctA=data.settings.defaultPctA; renderSplit(); };
+
+function renderPayer(){ const n=N(); seg($('#fPayer'), [['a',n.a],['b',n.b]], form.payer, v=>{ form.payer=v; renderPayer(); }); }
+
+/* receipts: GitHub mode → file in receipts/ of the private repo; local mode → device storage */
+const rcCache = {};
+let rcPending = Promise.resolve();
+const isPdfPath = p => /\.pdf$/i.test(p||'') || /^data:application\/pdf/.test(localStorage.getItem((p||'').slice(6))||'');
 function compressImage(file){
   return new Promise((res,rej)=>{
-    const img = new Image(), url = URL.createObjectURL(file);
-    img.onload = () => {
-      const MAX=1600, s=Math.min(1, MAX/Math.max(img.width,img.height));
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{ const s=Math.min(1,1600/Math.max(img.width,img.height));
       const cv=document.createElement('canvas'); cv.width=Math.round(img.width*s); cv.height=Math.round(img.height*s);
       cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height); URL.revokeObjectURL(url);
-      cv.toBlob(b=> b? res(b) : rej(new Error('לא הצלחתי לעבד את התמונה')), 'image/jpeg', 0.75);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('קובץ התמונה לא נתמך')); };
-    img.src = url;
+      cv.toBlob(b=>b?res(b):rej(new Error('לא הצלחתי לעבד את התמונה')),'image/jpeg',0.75); };
+    img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('קובץ התמונה לא נתמך')); };
+    img.src=url;
   });
 }
 const blobToDataUrl = b => new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(b); });
 $('#rcPick').onclick = () => $('#fReceipt').click();
-let rcPending = Promise.resolve();
 $('#fReceipt').onchange = ev => { rcPending = pickReceipt(ev); };
 async function pickReceipt(ev){
-  const f = ev.target.files[0]; if(!f) return;
-  $('#rcPick').textContent = '⏳ מעבד תמונה…';
+  const f=ev.target.files[0]; if(!f) return;
+  $('#rcPick').textContent='⏳ מעבד…';
   try{
     let blob, ext;
-    if(f.type==='application/pdf'){ blob=f; ext='pdf'; if(f.size>8e6) throw new Error('קובץ PDF גדול מדי (עד 8MB)'); }
-    else { blob = await compressImage(f); ext='jpg'; }
+    if(f.type==='application/pdf'){ if(f.size>8e6) throw new Error('PDF גדול מדי (עד 8MB)'); blob=f; ext='pdf'; }
+    else { blob=await compressImage(f); ext='jpg'; }
     if(form.newReceipt) URL.revokeObjectURL(form.newReceipt.url);
-    form.newReceipt = { blob, ext, url:URL.createObjectURL(blob), name:f.name };
-    form.removeReceipt = false;
-    renderReceipt();
-  }catch(e){ toast('⚠️ '+e.message); renderReceipt(); }
-  ev.target.value='';
+    form.newReceipt={blob,ext,url:URL.createObjectURL(blob)}; form.removeReceipt=false;
+  }catch(e){ toast('⚠️ '+e.message); }
+  renderReceipt(); ev.target.value='';
 }
-$('#rcRemove').onclick = () => {
-  if(form.newReceipt){ URL.revokeObjectURL(form.newReceipt.url); form.newReceipt=null; }
-  else form.removeReceipt = true;
-  renderReceipt();
-};
+$('#rcRemove').onclick = () => { if(form.newReceipt){ URL.revokeObjectURL(form.newReceipt.url); form.newReceipt=null; } else form.removeReceipt=true; renderReceipt(); };
 async function receiptUrl(path){
   if(rcCache[path]) return rcCache[path];
-  let url;
-  if(path.startsWith('local:')) url = localStorage.getItem(path.slice(6));
-  else url = URL.createObjectURL(await ghGetRaw(path));
+  const url = path.startsWith('local:') ? localStorage.getItem(path.slice(6)) : URL.createObjectURL(await ghGetRaw(path));
   if(!url) throw new Error('הקבלה לא נמצאה');
-  return rcCache[path] = url;
+  return rcCache[path]=url;
 }
 async function renderReceipt(){
-  const box=$('#rcPreview'), th=$('#rcThumb');
-  const nr=form.newReceipt, existing = !nr && form.receipt && !form.removeReceipt ? form.receipt : null;
-  box.classList.toggle('hidden', !nr && !existing);
-  $('#rcPick').textContent = (nr||existing)? '🔄 החלפת קבלה' : '📷 צילום / העלאת קבלה';
+  const nr=form.newReceipt, ex=!nr && form.receipt && !form.removeReceipt ? form.receipt : null, th=$('#rcThumb');
+  $('#rcPreview').classList.toggle('hidden', !nr && !ex);
+  $('#rcPick').textContent = (nr||ex)? '🔄 החלפת קבלה' : '📷 העלאת קבלה';
   th.style.backgroundImage=''; th.textContent='';
-  if(nr){
-    $('#rcName').textContent = 'קבלה חדשה (תישמר עם ההוצאה)';
-    if(nr.ext==='pdf') th.textContent='📄'; else th.style.backgroundImage=`url("${nr.url}")`;
-  } else if(existing){
-    $('#rcName').textContent = 'קבלה מצורפת';
-    if(isPdfPath(existing)){ th.textContent='📄'; return; }
+  if(nr){ $('#rcName').textContent='קבלה חדשה'; if(nr.ext==='pdf') th.textContent='📄'; else th.style.backgroundImage=`url("${nr.url}")`; }
+  else if(ex){
+    $('#rcName').textContent='קבלה מצורפת';
+    if(isPdfPath(ex)){ th.textContent='📄'; return; }
     th.textContent='⏳';
-    try{ const u=await receiptUrl(existing); if(form.receipt===existing){ th.textContent=''; th.style.backgroundImage=`url("${u}")`; } }
+    try{ const u=await receiptUrl(ex); if(form && form.receipt===ex){ th.textContent=''; th.style.backgroundImage=`url("${u}")`; } }
     catch(e){ th.textContent='⚠️'; $('#rcName').textContent='לא ניתן לטעון: '+e.message; }
   }
 }
@@ -538,234 +640,125 @@ async function openViewer(){
   let url, pdf;
   try{
     if(form.newReceipt){ url=form.newReceipt.url; pdf=form.newReceipt.ext==='pdf'; }
-    else if(form.receipt){ url=await receiptUrl(form.receipt); pdf=isPdfPath(form.receipt); }
-    else return;
+    else if(form.receipt){ url=await receiptUrl(form.receipt); pdf=isPdfPath(form.receipt); } else return;
   }catch(e){ toast('⚠️ '+e.message); return; }
   $('#viewerBody').innerHTML = pdf? `<iframe src="${url}"></iframe>` : `<img src="${url}" alt="קבלה">`;
-  $('#viewerOpen').href = url; $('#viewerOpen').download = pdf? 'receipt.pdf':'receipt.jpg';
+  $('#viewerOpen').href=url; $('#viewerOpen').download = pdf?'receipt.pdf':'receipt.jpg';
   $('#viewer').classList.remove('hidden');
 }
 $('#rcView').onclick = openViewer; $('#rcThumb').onclick = openViewer;
 $('#viewerClose').onclick = () => { $('#viewer').classList.add('hidden'); $('#viewerBody').innerHTML=''; };
 async function storeReceipt(expId, nr){
   if(cfg){
-    const dir = cfg.path.includes('/')? cfg.path.slice(0, cfg.path.lastIndexOf('/')+1) : '';
+    const dir = cfg.path.includes('/')? cfg.path.slice(0,cfg.path.lastIndexOf('/')+1) : '';
     const path = `${dir}receipts/${expId}-${Date.now().toString(36)}.${nr.ext}`;
-    const b64 = (await blobToDataUrl(nr.blob)).split(',')[1];
-    await ghPutRaw(path, b64, 'קבלה להוצאה');
+    await ghPutRaw(path, (await blobToDataUrl(nr.blob)).split(',')[1], 'קבלה');
     return path;
   }
-  const key = 'oh_rc_'+expId+'-'+Date.now().toString(36);
+  const key='oh_rc_'+expId+'-'+Date.now().toString(36);
   try{ localStorage.setItem(key, await blobToDataUrl(nr.blob)); }
-  catch(e){ throw new Error('אין מספיק מקום במכשיר. חברו את הסנכרון ל-GitHub כדי לשמור קבלות'); }
+  catch(e){ throw new Error('אין מקום בטלפון. חברו את הסנכרון כדי לשמור קבלות'); }
   return 'local:'+key;
 }
 function dropReceipt(path){
   if(!path) return;
-  if(path.startsWith('local:')) localStorage.removeItem(path.slice(6));
-  else if(cfg) ghDeleteFile(path).catch(()=>{});
+  if(path.startsWith('local:')) localStorage.removeItem(path.slice(6)); else if(cfg) ghDeleteFile(path).catch(()=>{});
   delete rcCache[path];
 }
 
+/* confirm */
 $('#fSave').onclick = async () => {
   const amount = parseFloat($('#fAmount').value);
   if(!(amount>0)){ toast('נא להזין סכום'); $('#fAmount').focus(); return; }
-  await rcPending;   // wait if a receipt photo is still being processed
-  const date = $('#fDate').value || todayStr();
-  const e = { id: form.id || uid(), date, amount: Math.round(amount*100)/100, cat: form.cat, payer: form.payer,
-              forWhom: form.forWhom, note: $('#fNote').value.trim(), by: me, ts: Date.now() };
-  const oldReceipt = form.receipt || null;
-  let receipt = form.removeReceipt ? null : oldReceipt;
+  if(!form.cat){ toast('נא לבחור סוג'); $('#catSearch').focus(); return; }
+  await rcPending;
+  const id = form.id || uid();
+  const old = form.id && data.expenses.find(x=>x.id===form.id);
+  const oldReceipt = form.receipt||null;
+  let receipt = form.removeReceipt? null : oldReceipt;
   if(form.newReceipt){
     const btn=$('#fSave'); btn.disabled=true; btn.textContent='⏳ מעלה קבלה…';
-    try{ receipt = await storeReceipt(e.id, form.newReceipt); }
+    try{ receipt = await storeReceipt(id, form.newReceipt); }
     catch(err){ toast('⚠️ העלאת הקבלה נכשלה: '+err.message); return; }
-    finally{ btn.disabled=false; btn.textContent='שמירה'; }
+    finally{ btn.disabled=false; btn.textContent='אישור'; }
   }
+  const pctA = r2(form.pctA);
+  const e = { id, date:$('#fDate').value||todayStr(), amount:r2(amount), cat:form.cat, pctA, shareA:r2(amount*pctA/100),
+              splitMode:form.mode, payer:form.payer, note:$('#fNote').value.trim(), by:me, ts: old? old.ts : Date.now() };
   if(receipt) e.receipt = receipt;
-  const editing = !!form.id;
-  const c = catOf(e.cat);
-  resetForm(); render();
-  toast(editing? 'ההוצאה עודכנה ✓' : `נשמר: ${fmt(e.amount)} ${c.icon} ${c.name}${receipt?' 🧾':''}`);
-  if(editing){ go('list'); }
-  await change(d=>{
-    const i = d.expenses.findIndex(x=>x.id===e.id);
-    if(i>=0) d.expenses[i]=e; else d.expenses.push(e);
-  }, `${editing?'עדכון':'הוספה'}: ${e.amount} ${c.name}`);
+  const c = catOf(e.cat), editing = !!form.id;
+  if(form.newReceipt) URL.revokeObjectURL(form.newReceipt.url);
+  form = null; closeModal('#expModal');
+  if(e.date.slice(0,7)!==month){ month=e.date.slice(0,7); }
+  toast(editing? 'ההוצאה עודכנה ✓' : `נוסף: ${c.icon} ${c.name} ${fmt(e.amount)}`);
+  await change(d=>{ const i=d.expenses.findIndex(x=>x.id===e.id); if(i>=0) d.expenses[i]=e; else d.expenses.push(e); },
+               `${editing?'עדכון':'הוספה'}: ${e.amount} ${c.name}`);
   if(oldReceipt && oldReceipt!==receipt) dropReceipt(oldReceipt);
 };
-$('#fCancel').onclick = () => { resetForm(); go('list'); };
-$('#fDelete').onclick = async () => {
-  if(!form.id || !confirm('למחוק את ההוצאה?')) return;
-  const id=form.id, rc=form.receipt; resetForm(); go('list'); toast('נמחק');
-  await change(d=>{ d.expenses = d.expenses.filter(x=>x.id!==id); }, 'מחיקת הוצאה');
-  dropReceipt(rc);
-};
-function editExpense(id){
-  const e = data.expenses.find(x=>x.id===id); if(!e) return;
-  if(form.newReceipt) URL.revokeObjectURL(form.newReceipt.url);
-  form = { id:e.id, cat:e.cat, payer:e.payer, forWhom:e.forWhom||'shared', receipt:e.receipt||null, newReceipt:null, removeReceipt:false };
-  $('#fAmount').value=e.amount; $('#fDate').value=e.date; $('#fNote').value=e.note||'';
-  renderReceipt();
-  go('add');
-}
 
-function monthExpenses(m){ return data.expenses.filter(e=>e.date && e.date.slice(0,7)===m); }
-
-function renderList(){
-  const n=N();
-  const sel=$('#lFilter');
-  sel.innerHTML = `<option value="">כל הקטגוריות</option>` + data.settings.categories.map(c=>`<option value="${esc(c.id)}">${esc(c.icon+' '+c.name)}</option>`).join('');
-  sel.value = listFilter;
-  let items = monthExpenses(month);
-  if(listFilter) items = items.filter(e=>e.cat===listFilter);
-  items.sort((x,y)=> y.date.localeCompare(x.date) || y.ts-x.ts);
-  const tot = items.reduce((s,e)=>s+e.amount,0);
-  $('#lTotal').textContent = items.length? `${items.length} הוצאות · סה"כ ${fmt(tot)}` : '';
-  if(!items.length){ $('#lItems').innerHTML = `<div class="empty">אין הוצאות בחודש הזה${listFilter?' בקטגוריה הזו':''}</div>`; return; }
-  let html='', lastDay='';
-  for(const e of items){
-    if(e.date!==lastDay){ lastDay=e.date; const [y,m,d]=e.date.split('-'); html+=`<div class="day">${+d}.${+m}</div>`; }
-    const c=catOf(e.cat);
-    const forTxt = (e.forWhom&&e.forWhom!=='shared') ? ` · עבור ${esc(n[e.forWhom])} בלבד` : '';
-    html += `<div class="item" data-id="${esc(e.id)}"><div class="ic">${esc(c.icon)}</div>
-      <div class="mid"><div class="t">${esc(c.name)}<span class="tag ${e.payer}">${esc(n[e.payer])}</span>${e.receipt?' 🧾':''}</div>
-      <div class="s">${esc(e.note||'')}${forTxt}</div></div>
-      <div class="amt">${fmt(e.amount)}</div></div>`;
-  }
-  $('#lItems').innerHTML = html;
-}
-$('#lFilter').onchange = e => { listFilter=e.target.value; renderList(); };
-$('#lItems').addEventListener('click', e=>{ const it=e.target.closest('.item'); if(it) editExpense(it.dataset.id); });
-
-function calcMonth(m){
-  const r = ratioFor(m)/100;
-  let total=0, paidA=0, paidB=0, shareA=0, shareB=0, shared=0;
-  for(const e of monthExpenses(m)){
-    total+=e.amount;
-    if(e.payer==='a') paidA+=e.amount; else paidB+=e.amount;
-    const f=e.forWhom||'shared';
-    if(f==='shared'){ shared+=e.amount; shareA+=e.amount*r; shareB+=e.amount*(1-r); }
-    else if(f==='a') shareA+=e.amount; else shareB+=e.amount;
-  }
-  return { total, paidA, paidB, shareA, shareB, shared, balA: paidA-shareA };
-}
-
-function renderSum(){
-  const n=N(), list=monthExpenses(month), c=calcMonth(month);
-  const r = ratioFor(month);
-  $('#sTotal').textContent = fmt(c.total);
-  $('#sCount').textContent = `${list.length} הוצאות · מתוכן משותפות ${fmt(c.shared)}`;
-  $('#sRatio').value = r;
-  $('#sRa').textContent = `${n.a} ${r}%`; $('#sRb').textContent = `${n.b} ${100-r}%`;
-  const custom = data.settings.monthRatios[month]!=null;
-  $('#sRatioHint').innerHTML = custom
-    ? `נקבע יחס מיוחד לחודש הזה. <a href="#" id="sRatioReset">חזרה לברירת המחדל (${data.settings.defaultRatio}%)</a>`
-    : `לפי ברירת המחדל. הזזת הסרגל תקבע יחס לחודש ${mLabel(month)} בלבד.`;
-  const rr=$('#sRatioReset'); if(rr) rr.onclick = ev => { ev.preventDefault(); change(d=>{ delete d.settings.monthRatios[month]; }, 'איפוס יחס '+month); };
-
-  const bal = Math.round(c.balA*100)/100;
-  const settled = !!data.settings.settled[month];
-  $('#sSettle').innerHTML = Math.abs(bal)<0.5 ? '🤝 אתם מאוזנים, אין העברות'
-    : bal>0 ? `${esc(n.b)} מעביר/ה ל${esc(n.a)}: <span dir="ltr">${fmt(bal)}</span>`
-            : `${esc(n.a)} מעביר/ה ל${esc(n.b)}: <span dir="ltr">${fmt(-bal)}</span>`;
-  if(settled) $('#sSettle').innerHTML += '<div class="muted" style="margin-top:6px">✅ החודש סומן כמסולק</div>';
-  $('#sTable').innerHTML = `<tr><th></th><th class="n">${esc(n.a)}</th><th class="n">${esc(n.b)}</th></tr>
-    <tr><td>שילם/ה בפועל</td><td class="n">${fmt(c.paidA)}</td><td class="n">${fmt(c.paidB)}</td></tr>
-    <tr><td>החלק שלו/ה</td><td class="n">${fmt(c.shareA)}</td><td class="n">${fmt(c.shareB)}</td></tr>`;
-  $('#sSettledBtn').textContent = settled? 'ביטול סימון "מסולק"' : 'סימון החודש כמסולק ✅';
-
-  const byCat = {};
-  for(const e of list) byCat[e.cat]=(byCat[e.cat]||0)+e.amount;
-  const rows = Object.entries(byCat).sort((x,y)=>y[1]-x[1]);
-  const max = rows.length? rows[0][1] : 1;
-  $('#sCats').innerHTML = rows.length ? rows.map(([id,v])=>{ const k=catOf(id);
-    return `<div class="crow"><div class="top"><span>${esc(k.icon)} ${esc(k.name)}</span><span dir="ltr">${fmt(v)} · ${Math.round(v/c.total*100)}%</span></div>
-      <div class="bar"><i style="width:${(v/max*100).toFixed(1)}%"></i></div></div>`; }).join('')
-    : '<div class="empty">אין עדיין הוצאות בחודש הזה</div>';
-
-  const months = [...Array(6)].map((_,i)=>shiftMonth(month,i-5));
-  const vals = months.map(m=>calcMonth(m).total); const mx=Math.max(1,...vals);
-  $('#sTrend').innerHTML = months.map((m,i)=>`<div class="crow"><div class="top"><span>${mLabel(m)}</span><span dir="ltr">${fmt(vals[i])}</span></div>
-    <div class="bar"><i style="width:${(vals[i]/mx*100).toFixed(1)}%;${m===month?'':'opacity:.55'}"></i></div></div>`).join('');
-}
-$('#sRatio').oninput = e => { const v=+e.target.value, n=N(); $('#sRa').textContent=`${n.a} ${v}%`; $('#sRb').textContent=`${n.b} ${100-v}%`; };
-$('#sRatio').onchange = e => { const v=+e.target.value, m=month; change(d=>{ d.settings.monthRatios[m]=v; }, `יחס ${m}: ${v}%`); toast(`יחס ל${mLabel(m)}: ${v}/${100-v}`); };
-$('#sSettledBtn').onclick = () => { const m=month; const val=!data.settings.settled[m];
-  change(d=>{ if(val) d.settings.settled[m]=true; else delete d.settings.settled[m]; }, (val?'סימון מסולק ':'ביטול מסולק ')+m); };
-
+/* ================= Settings ================= */
+$('#gear').onclick = () => { renderSettings(); openModal('#setModal'); };
 function renderSettings(){
   const n=N(), s=data.settings;
-  seg($('#setMe'), [['a',n.a],['b',n.b]], me, v=>{ me=v; localStorage.setItem(LS.me,v); form.payer=v; renderSettings(); });
+  seg($('#setMe'), [['a',n.a],['b',n.b]], me, v=>{ me=v; localStorage.setItem(LS.me,v); renderSettings(); });
   $('#setNameA').value=n.a; $('#setNameB').value=n.b;
-  $('#setRatio').value=s.defaultRatio; $('#setRa').textContent=`${n.a} ${s.defaultRatio}%`; $('#setRb').textContent=`${n.b} ${100-s.defaultRatio}%`;
-  $('#setCats').innerHTML = s.categories.map(c=>`<span class="chip">${esc(c.icon)} ${esc(c.name)}<button data-id="${esc(c.id)}" title="מחיקה">✕</button></span>`).join('');
-  $('#ghState').textContent = cfg ? `מחובר ל-${cfg.owner}/${cfg.repo} (${cfg.path}). שני המכשירים צריכים להיות מחוברים לאותו repository.`
-                                  : 'כרגע הנתונים נשמרים רק במכשיר הזה. כדי לעבוד ביחד, חברו את שניכם לאותו repository.';
-  $('#ghOwner').value = cfg?.owner||''; $('#ghRepo').value = cfg?.repo||''; $('#ghPath').value = cfg?.path||'expenses.json';
-  $('#ghToken').value = cfg?.token||'';
-  const localData = normalize(JSON.parse(localStorage.getItem(LS.local)||'null'));
-  $('#ghMigrate').classList.toggle('hidden', !(cfg && localData.expenses.length));
+  $('#setPctA').value=s.defaultPctA; $('#setPctB').value=100-s.defaultPctA;
+  $('#setRatioHint').textContent = `${n.a} ${s.defaultPctA}% · ${n.b} ${100-s.defaultPctA}% (${ratioText(s.defaultPctA)}). אפשר לשנות לכל הוצאה בנפרד.`;
+  $('#setCats').innerHTML = s.categories.map(c=>`<span class="chip">${esc(c.icon)} ${esc(c.name)}<button class="linkbtn del" data-id="${esc(c.id)}" title="מחיקה" style="text-decoration:none">✕</button></span>`).join('');
+  $('#ghState').textContent = cfg ? `מחובר ל-${cfg.owner}/${cfg.repo}` : 'לא מחובר: הנתונים נשמרים רק בטלפון הזה.';
+  $('#ghOwner').value=cfg?.owner||'sallaryandpension'; $('#ghRepo').value=cfg?.repo||'OH-data'; $('#ghPath').value=cfg?.path||'expenses.json'; $('#ghToken').value=cfg?.token||'';
+  const local = normalize(JSON.parse(localStorage.getItem(LS.local)||'null'));
+  $('#ghMigrate').classList.toggle('hidden', !(cfg && local.expenses.length));
 }
 $('#setNamesSave').onclick = () => { const a=$('#setNameA').value.trim()||'אור', b=$('#setNameB').value.trim()||'הדר';
-  change(d=>{ d.settings.names={a,b}; }, 'עדכון שמות'); toast('נשמר'); };
-$('#setRatio').oninput = e => { const v=+e.target.value, n=N(); $('#setRa').textContent=`${n.a} ${v}%`; $('#setRb').textContent=`${n.b} ${100-v}%`; };
-$('#setRatio').onchange = e => { const v=+e.target.value; change(d=>{ d.settings.defaultRatio=v; }, `יחס ברירת מחדל: ${v}%`); toast('יחס ברירת המחדל עודכן'); };
+  change(d=>{ d.settings.names={a,b}; }, 'שמות'); toast('נשמר'); renderSettings(); };
+$('#setPctA').oninput = e => { const v=Math.min(100,Math.max(0,+e.target.value||0)); $('#setPctB').value=100-v; };
+$('#setPctA').onchange = e => { const v=Math.min(100,Math.max(0,Math.round(+e.target.value||0)));
+  change(d=>{ d.settings.defaultPctA=v; }, `יחס ברירת מחדל ${v}%`); toast('יחס ברירת המחדל עודכן'); renderSettings(); };
 $('#setCats').onclick = e => { const b=e.target.closest('button'); if(!b) return; const id=b.dataset.id;
-  if(data.settings.categories.length<=1) return;
-  if(!confirm('למחוק את הקטגוריה? הוצאות קיימות יישארו ויוצגו כ"אחר".')) return;
-  change(d=>{ d.settings.categories=d.settings.categories.filter(c=>c.id!==id); }, 'מחיקת קטגוריה'); };
-$('#addCat').onclick = () => { const name=$('#newCatName').value.trim(); if(!name) return; const icon=$('#newCatIcon').value.trim()||'🏷️';
-  const id='c'+uid(); $('#newCatName').value=''; $('#newCatIcon').value='';
-  change(d=>{ d.settings.categories.push({id,name,icon}); }, 'קטגוריה חדשה: '+name); toast('הקטגוריה נוספה'); };
-
+  if(data.settings.categories.length<=1 || !confirm('למחוק את הסוג? הוצאות קיימות יוצגו כ"אחר".')) return;
+  change(d=>{ d.settings.categories=d.settings.categories.filter(c=>c.id!==id); }, 'מחיקת סוג'); renderSettings(); };
 $('#ghConnect').onclick = async () => {
   const c = { owner:$('#ghOwner').value.trim(), repo:$('#ghRepo').value.trim(), path:$('#ghPath').value.trim()||'expenses.json', token:$('#ghToken').value.trim() };
   if(!c.owner||!c.repo||!c.token){ toast('נא למלא owner, repository ו-Token'); return; }
-  const prev = cfg; cfg = c; setSync('loading');
+  const prev=cfg; cfg=c; setSync('loading');
   try{
-    const { d, sha:s } = await ghFetch();
-    if(!s){ // file doesn't exist yet: create it (with this device's local data if any)
+    const { d, sha:s } = await ghFetch(false);
+    if(!s){
       const init = normalize(JSON.parse(localStorage.getItem(LS.local)||'null'));
-      const put = await ghPut(init, null, 'יצירת קובץ ההוצאות');
-      if(put.conflict) throw new Error('התנגשות, נסו שוב');
-      data = init; sha = put.sha; localStorage.removeItem(LS.local);
-    } else { data = d; sha = s; }
-    localStorage.setItem(LS.cfg, JSON.stringify(cfg)); persistLocal(); setSync('ok'); toast('מחובר ✓'); render();
-  }catch(e){ cfg = prev; setSync(cfg?'error':'local', e.message); toast('⚠️ '+e.message); }
+      const put = await ghPut(init, null, 'יצירת קובץ ההוצאות'); if(put.conflict) throw new Error('התנגשות, נסו שוב');
+      data=init; localStorage.removeItem(LS.local);
+    } else data=d;
+    localStorage.setItem(LS.cfg, JSON.stringify(cfg)); persistLocal(); setSync('ok'); toast('מחובר ✓'); render(); renderSettings();
+  }catch(e){ cfg=prev; setSync(cfg?'error':'local', e.message); toast('⚠️ '+e.message); }
 };
-$('#ghDisconnect').onclick = () => { if(!cfg || !confirm('לנתק את הסנכרון במכשיר הזה? (הנתונים ב-GitHub לא יימחקו)')) return;
+$('#ghDisconnect').onclick = () => { if(!cfg || !confirm('לנתק את הסנכרון בטלפון הזה? (הנתונים ב-GitHub נשארים)')) return;
   localStorage.setItem(LS.local, JSON.stringify(data)); localStorage.removeItem(LS.cfg); localStorage.removeItem(LS.cache);
-  cfg=null; sha=null; setSync('local'); render(); };
+  cfg=null; setSync('local'); render(); renderSettings(); };
 $('#ghUpload').onclick = async () => {
-  const local = normalize(JSON.parse(localStorage.getItem(LS.local)||'null'));
-  if(!local.expenses.length) return;
-  await change(d=>{ const ids=new Set(d.expenses.map(e=>e.id)); for(const e of local.expenses) if(!ids.has(e.id)) d.expenses.push(e); }, `העלאת ${local.expenses.length} הוצאות מקומיות`);
-  localStorage.removeItem(LS.local); toast('הועלו ✓'); render();
+  const local = normalize(JSON.parse(localStorage.getItem(LS.local)||'null')); if(!local.expenses.length) return;
+  await change(d=>{ const ids=new Set(d.expenses.map(e=>e.id)); for(const e of local.expenses) if(!ids.has(e.id)) d.expenses.push(e); }, `העלאת ${local.expenses.length} הוצאות`);
+  localStorage.removeItem(LS.local); toast('הועלו ✓'); renderSettings();
 };
-
-function download(name, text, type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+function download(name,text,type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 $('#expJson').onclick = () => download(`expenses-${todayStr()}.json`, JSON.stringify(data,null,1), 'application/json');
-$('#expCsv').onclick = () => { const n=N();
-  const q = v => `"${String(v??'').replace(/"/g,'""')}"`;
-  const rows = [['תאריך','סכום','קטגוריה','שילם/ה','עבור','הערה']].concat(
-    [...data.expenses].sort((x,y)=>x.date.localeCompare(y.date)).map(e=>[e.date,e.amount,catOf(e.cat).name,n[e.payer],
-      e.forWhom==='shared'||!e.forWhom?'משותף':n[e.forWhom], e.note]));
+$('#expCsv').onclick = () => { const n=N(), q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const rows=[['תאריך','סכום','סוג','שילם/ה',`חלק ${n.a}`,`חלק ${n.b}`,'הערה']].concat(
+    [...data.expenses].sort((x,y)=>x.date.localeCompare(y.date)).map(e=>[e.date,e.amount,catOf(e.cat).name,n[e.payer],e.shareA,r2(e.amount-e.shareA),e.note]));
   download(`expenses-${todayStr()}.csv`, '﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n'), 'text/csv;charset=utf-8'); };
 
-/* ================= Navigation ================= */
-function go(v){ view=v; $$('nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
-  ['add','list','sum','set'].forEach(x=>$('#v-'+x).classList.toggle('hidden', x!==v)); window.scrollTo(0,0); render(); }
-$('nav').onclick = e => { const b=e.target.closest('button'); if(b){ if(b.dataset.v==='add' && view!=='add' && form.id) resetForm(); go(b.dataset.v); } };
-$$('.monthbar').forEach(mb=>mb.onclick = e => { const b=e.target.closest('button'); if(b){ month=shiftMonth(month, +b.dataset.m); render(); } });
-$('#sync').onclick = () => { if(cfg) refresh(); else go('set'); };
+/* first run: who am I */
+$$('#meModal [data-me]').forEach(b=>b.onclick = () => { me=b.dataset.me; localStorage.setItem(LS.me,me); closeModal('#meModal'); toast(`שלום ${N()[me]} 👋`); });
+function askMe(){ const n=N(); $('#meModal [data-me="a"]').textContent=n.a; $('#meModal [data-me="b"]').textContent=n.b; openModal('#meModal'); }
 
 /* ================= Start ================= */
-resetForm(); render();
+render();
 if(cfg) refresh(); else setSync('local');
+if(!me) askMe();
+$('#sync').onclick = () => { if(cfg) refresh(); else $('#gear').click(); };
 setInterval(()=>{ if(cfg && document.visibilityState==='visible') refresh(true); }, 5000);
-if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') refresh(true); });
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>

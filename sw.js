@@ -1,7 +1,7 @@
 // Minimal service worker: lets the app open even without internet (the last saved data is shown).
 // The app files are always taken from the network first, so updates arrive immediately.
 // Requests to api.github.com (the data itself) are never cached here.
-const CACHE = 'oh-expenses-v1';
+const CACHE = 'oh-expenses-v2';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
