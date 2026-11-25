@@ -287,6 +287,9 @@
       <button class="btn ghost" id="expCsv">ייצוא CSV</button>
       <button class="btn ghost" id="expJson">ייצוא JSON</button>
     </div>
+    <div style="height:10px"></div>
+    <button class="btn ghost" id="installFromSettings">📲 איך מתקינים בטלפון?</button>
+    <div class="muted" style="text-align:center;margin-top:10px">גרסה 9</div>
   </div>
 </div>
 
@@ -865,10 +868,10 @@ let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; showInstallBar(); });
 window.addEventListener('appinstalled', () => { $('#installBar').classList.add('hidden'); toast('✓ האפליקציה הותקנה'); });
 function showInstallBar(){
-  if(isStandalone || localStorage.getItem('oh_install_hidden')) return;
-  if(isMobile || deferredPrompt) $('#installBar').classList.remove('hidden');
+  if(isStandalone) return;
+  $('#installBar').classList.remove('hidden');
 }
-$('#installX').onclick = () => { localStorage.setItem('oh_install_hidden','1'); $('#installBar').classList.add('hidden'); };
+$('#installX').onclick = () => { $('#installBar').classList.add('hidden'); };
 $('#installBtn').onclick = async () => {
   if(deferredPrompt){ deferredPrompt.prompt(); const r = await deferredPrompt.userChoice; deferredPrompt = null; if(r.outcome==='accepted') $('#installBar').classList.add('hidden'); return; }
   const share = '<span class="sh">⬆︎</span>';
@@ -882,6 +885,9 @@ $('#installBtn').onclick = async () => {
     if(!isIOSSafari) html += `<div class="warn">⚠️ נראה שהקישור נפתח בתוך אפליקציה אחרת (וואטסאפ, אינסטגרם או כרום).
       אם אין "הוספה למסך הבית", צריך לפתוח את הקישור ב<b>ספארי</b>: לוחצים על ⋯ או על סמל המצפן ובוחרים "פתיחה בספארי".
       אפשר גם להעתיק את הכתובת ולהדביק בספארי:<br><b dir="ltr">${esc(location.href.split('?')[0])}</b></div>`;
+  } else if(!isMobile){
+    html = `<p>מתקינים את האפליקציה <b>בטלפון</b>: פותחים בטלפון את הכתובת<br><b dir="ltr">${esc(location.href.split('?')[0])}</b><br>ולוחצים שם על "התקנה".</p>
+      <ul><li><b>אייפון:</b> בספארי, שיתוף ⬆️, ואז "הוספה למסך הבית"</li><li><b>אנדרואיד:</b> בכרום, תפריט ⋮, ואז "התקנת אפליקציה"</li></ul>`;
   } else {
     html = `<ol>
       <li>פותחים את הקישור ב<b>כרום</b></li>
@@ -891,6 +897,8 @@ $('#installBtn').onclick = async () => {
   $('#installSteps').innerHTML = html;
   openModal('#installModal');
 };
+
+$('#installFromSettings').onclick = () => { closeModal('#setModal'); $('#installBtn').click(); };
 
 /* ================= Start ================= */
 render();
