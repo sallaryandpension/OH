@@ -55,7 +55,8 @@
   .seg button.on{background:var(--brand);color:#fff;font-weight:600}
   .muted{color:var(--muted);font-size:13px}
   .hidden{display:none!important}
-  .ltr{direction:ltr;unicode-bidi:embed}
+  .ltr{direction:ltr;unicode-bidi:isolate}
+  .exp .t .amt, td.n, .total b{unicode-bidi:isolate}
 
   /* expense rows */
   .exp{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -137,6 +138,8 @@
     <button id="mNext" title="חודש הבא">‹</button>
   </div>
 
+  <div class="card total" style="align-items:center;padding:12px 16px"><span>שילמנו ביחד</span><b id="sTotal"></b></div>
+
   <button class="btn big" id="addBtn">➕ הוסף הוצאה</button>
 
   <div class="card">
@@ -145,7 +148,6 @@
 
   <div class="card" id="sumCard">
     <h3>סיכום החודש</h3>
-    <div class="total"><span>שילמנו ביחד</span><b id="sTotal"></b></div>
     <table id="sTable"></table>
     <div style="height:12px"></div>
     <button class="btn" id="calcBtn">🧮 חישוב</button>
