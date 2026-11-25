@@ -59,16 +59,18 @@
   .exp .t .amt, td.n, .total b{unicode-bidi:isolate}
 
   /* expense rows */
-  .exp{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
-  .exp:last-child{border-bottom:0}
-  .exp .ic{font-size:26px;width:34px;text-align:center;line-height:1.2}
-  .exp .mid{flex:1;min-width:0}
-  .exp .t{font-weight:650;display:flex;justify-content:space-between;gap:8px}
-  .exp .t .amt{direction:ltr;white-space:nowrap}
-  .exp .s{font-size:13px;color:var(--muted);margin-top:2px}
-  .exp .split{font-size:13px;margin-top:4px}
-  .exp .acts{display:flex;flex-direction:column;gap:4px}
-  .exp .acts button{background:var(--bg);border:1px solid var(--line);border-radius:8px;width:34px;height:32px;cursor:pointer;font-size:15px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .col{min-width:0}
+  .colh{display:flex;justify-content:space-between;align-items:baseline;gap:4px;padding:8px 10px;border-radius:10px;color:#fff;font-weight:650;font-size:14px;margin-bottom:6px}
+  .colh.a{background:var(--a)}.colh.b{background:var(--b)}
+  .colh b{font-size:15px}
+  .exp{border:1px solid var(--line);border-radius:10px;padding:8px 9px;margin-bottom:6px;background:var(--bg)}
+  .exp .t{font-weight:650;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .exp .amt{font-weight:750;font-size:17px;direction:ltr;text-align:end;unicode-bidi:isolate;margin-top:2px}
+  .exp .s{font-size:12px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .exp .split{font-size:12px;margin-top:3px}
+  .exp .acts{display:flex;gap:6px;margin-top:6px}
+  .exp .acts button{flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;height:30px;cursor:pointer;font-size:14px}
   .who{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;color:#fff}
   .who.a{background:var(--a)}.who.b{background:var(--b)}
   .rows-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;color:var(--ink);
@@ -477,19 +479,12 @@ function render(){
   const items = monthExpenses(month).sort((x,y)=> y.date.localeCompare(x.date) || y.ts-x.ts);
   $('#rowsCount').textContent = items.length ? `הוצאות החודש (${items.length})` : 'אין עדיין הוצאות בחודש הזה';
   $('#rows').innerHTML = !items.length ? `<div class="empty">עוד אין הוצאות בחודש הזה.<br>לחצו על "הוסף הוצאה" כדי להתחיל.</div>`
-    : items.map(e=>{
-      const c=catOf(e.cat), [,mm,dd]=e.date.split('-');
-      const sB=r2(e.amount-e.shareA);
-      return `<div class="exp" data-id="${esc(e.id)}">
-        <div class="ic">${esc(c.icon)}</div>
-        <div class="mid">
-          <div class="t"><span>${esc(c.name)}${e.receipt?' 🧾':''}</span><span class="amt"${e.amount<0?' style="color:var(--danger)"':''}>${fmt(e.amount)}</span></div>
-          <div class="s">${+dd}.${+mm} · שילם/ה: <span class="who ${e.payer}">${esc(n[e.payer])}</span>${e.note?' · '+esc(e.note):''}</div>
-          <div class="split">${esc(n.a)} <b class="ltr">${fmt(e.shareA)}</b> · ${esc(n.b)} <b class="ltr">${fmt(sB)}</b>
-            <span class="muted">(${Math.round(e.pctA)}% / ${Math.round(100-e.pctA)}%)</span></div>
-        </div>
-        <div class="acts"><button data-act="edit" title="עריכה">✏️</button><button data-act="del" title="מחיקה">🗑️</button></div>
-      </div>`; }).join('');
+    : `<div class="cols">${['a','b'].map(p=>{
+        const mine = items.filter(e=>e.payer===p), sum = mine.reduce((s,e)=>s+e.amount,0);
+        return `<div class="col">
+          <div class="colh ${p}"><span>${esc(n[p])} ${p==='a'?'שילם':'שילמה'}</span><b class="ltr">${fmt(sum)}</b></div>
+          ${mine.length ? mine.map(expCard).join('') : '<div class="muted" style="text-align:center;padding:14px 0">אין</div>'}
+        </div>`; }).join('')}</div>`;
 
   const c = calcMonth(month);
   $('#sTotal').textContent = fmt(c.total);
@@ -497,6 +492,16 @@ function render(){
     <tr><td>שילם/ה בפועל</td><td class="n">${fmt(c.paidA)}</td><td class="n">${fmt(c.paidB)}</td></tr>
     <tr><td>היה צריך לשלם לפי היחס</td><td class="n">${fmt(c.shareA)}</td><td class="n">${fmt(c.shareB)}</td></tr>`;
   if(!$('#result').classList.contains('hidden')) showResult();
+}
+function expCard(e){
+  const n=N(), c=catOf(e.cat), [,mm,dd]=e.date.split('-'), sB=r2(e.amount-e.shareA);
+  return `<div class="exp" data-id="${esc(e.id)}">
+    <div class="t"><span>${esc(c.icon)} ${esc(c.name)}${e.receipt?' 🧾':''}</span></div>
+    <div class="amt"${e.amount<0?' style="color:var(--danger)"':''}>${fmt(e.amount)}</div>
+    <div class="s">${+dd}.${+mm}${e.note?' · '+esc(e.note):''}</div>
+    <div class="split">${esc(n.a)} <b class="ltr">${fmt(e.shareA)}</b> · ${esc(n.b)} <b class="ltr">${fmt(sB)}</b></div>
+    <div class="acts"><button data-act="edit" title="עריכה">✏️</button><button data-act="del" title="מחיקה">🗑️</button></div>
+  </div>`;
 }
 function showResult(){
   const n=N(), c=calcMonth(month), el=$('#result');
